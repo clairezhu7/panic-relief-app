@@ -1,0 +1,27 @@
+{
+  "name": "panic-relief-app",
+  "version": "1.0.0",
+  "description": "An app that provides immediate relief for device users who experience panic attacks",
+  "homepage": "https://github.com/clairezhu7/panic-relief-app#readme",
+  "bugs": {
+    "url": "https://github.com/clairezhu7/panic-relief-app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clairezhu7/panic-relief-app.git"
+  },
+  "license": "MIT",
+  "author": "Claire & Vicky",
+  "type": "commonjs",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "electron": "^41.5.0"
+  }
+}

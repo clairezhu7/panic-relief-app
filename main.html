@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" />
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <title>Panic Relief App</title>
+</head>
+
+<body>
+    <div id="page"></div>
+
+    <script>
+        // get local storage
+
+        const params = new URLSearchParams(window.location.search)
+        const page = params.get('page') || 'home'
+
+
+        if (page === 'home') {
+            document.getElementById('page').innerHTML = `
+            <h1>What do you need?</h1>
+            <button onclick="window.electronAPI.navigate('breathing')">🫁 Breathing</button>
+            <button onclick="window.electronAPI.navigate('grounding')">🌱 Grounding</button>
+        `
+        } else {
+            fetch(`pages/${page}.html`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('page').innerHTML = html
+
+                    const css = document.createElement('link')
+                    css.rel = 'stylesheet'
+                    css.href = `pages/${page}.css`
+                    document.head.appendChild(css)
+
+                    const script = document.createElement('script')
+                    script.src = `pages/${page}.js`
+                    document.body.appendChild(script)
+                })
+        }  
+    </script>
+
+    <script src="./renderer.js"></script>
+</body>
+
+</html>

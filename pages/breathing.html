@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Panic Relief — Breathing</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="breathing.css" />
+</head>
+
+<body>
+
+  <div id="breathing-container">
+
+    <!-- this wrapper holds the canvas, rings, and circle all stacked -->
+    <div id="circle-wrapper">
+
+      <!-- layer 1 (back): particles are drawn here -->
+      <canvas id="particle-canvas" width="260" height="260"></canvas>
+
+      <!-- layer 2 (middle): ripple rings that expand outward -->
+      <div class="ring" id="ring1"></div>
+      <div class="ring" id="ring2"></div>
+      <div class="ring" id="ring3"></div>
+
+      <!-- layer 3 (front): the main breathing circle -->
+      <div id="breath-circle">
+        <div id="phase-text"></div>
+        <div id="countdown"></div>
+      </div>
+
+    </div>
+
+    <!-- text below the circle -->
+    <div id="message">Box breathing — 4 counts each phase</div>
+    <div id="cycle-label"></div>
+
+    <!-- buttons -->
+    <div id="button-row">
+      <button id="start-btn" onclick="startBreathing()">Start</button>
+      <button onclick="resetBreathing()">Reset</button>
+    </div>
+
+  </div>
+
+  <script src="breathing.js"></script>
+
+</body>
+
+</html>

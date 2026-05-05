@@ -1,0 +1,147 @@
+body {
+  margin: 0;
+  background-color: #0f0f1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: white;
+}
+
+#breathing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+
+/* =============================================
+   CIRCLE WRAPPER
+   Holds all three layers stacked on top of each other:
+   canvas (particles) → rings → breathing circle
+   ============================================= */
+
+#circle-wrapper {
+  position: relative;       /* lets children use position: absolute */
+  width: 260px;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* =============================================
+   LAYER 1: PARTICLE CANVAS (behind everything)
+   ============================================= */
+
+#particle-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;     /* clicks pass through to circle */
+}
+
+
+/* =============================================
+   LAYER 2: RIPPLE RINGS
+   Start invisible and small, animate outward on each inhale/exhale
+   ============================================= */
+
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid #7F77DD;
+
+  /* start at same size as the resting circle */
+  width: 120px;
+  height: 120px;
+  opacity: 0;
+
+  /* center them in the wrapper */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+
+  pointer-events: none;
+}
+
+/* =============================================
+   LAYER 3: THE MAIN BREATHING CIRCLE (front)
+   Size and color change via JavaScript transitions
+   ============================================= */
+
+#breath-circle {
+  position: relative;       /* sits above canvas and rings */
+  z-index: 2;
+
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #AFA9EC;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+
+  /* smooth size and color transitions — duration set by JS per phase */
+  transition: width 0s, height 0s, background-color 1s;
+}
+
+#phase-text {
+  font-size: 1.8rem;
+  font-weight: 400;
+  color: white;
+  user-select: none;
+}
+
+#countdown {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 2px;
+}
+
+
+/* =============================================
+   TEXT AND BUTTONS BELOW THE CIRCLE
+   ============================================= */
+
+#message {
+  font-size: 15px;
+  font-weight: 500;
+  min-height: 22px;
+  text-align: center;
+}
+
+#cycle-label {
+  font-size: 13px;
+  opacity: 0.6;
+  text-align: center;
+}
+
+#button-row {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 8px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: transparent;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

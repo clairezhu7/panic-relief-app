@@ -1,10 +1,42 @@
 <!DOCTYPE html>
-<html>
-  <body style="margin:0; display:flex; justify-content:center; 
-               align-items:center; height:100vh; background:transparent;">
-    <div style="width:60px; height:60px; border-radius:50%; 
-                background:#7B61FF; cursor:pointer; opacity:0.85;"
-         onclick="alert('relief screen coming soon!')">
-    </div>
-  </body>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+
+    <style>
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+
+        }
+
+        #bubble {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: aquamarine;
+            opacity: 70%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bubble"></div>
+
+    <script>
+        const bubble = document.getElementById("bubble");
+
+        bubble.addEventListener("click", () => {
+            window.electronAPI.openMainWindow()
+        })
+    </script>
+
+</body>
+
 </html>

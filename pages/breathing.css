@@ -15,69 +15,50 @@ body {
   gap: 1.5rem;
 }
 
-
-/* =============================================
-   CIRCLE WRAPPER
-   Holds all three layers stacked on top of each other:
-   canvas (particles) → rings → breathing circle
-   ============================================= */
-
 #circle-wrapper {
-  position: relative;       /* lets children use position: absolute */
-  width: 260px;
-  height: 260px;
+  position: relative;
+  /* lets children use position: absolute */
+  width: 50vmin;
+  height: 50vmin;
+  min-width: 18rem;
+  min-height: 18rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
 }
-
-
-/* =============================================
-   LAYER 1: PARTICLE CANVAS (behind everything)
-   ============================================= */
 
 #particle-canvas {
   position: absolute;
   top: 0;
   left: 0;
-  pointer-events: none;     /* clicks pass through to circle */
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
-
-
-/* =============================================
-   LAYER 2: RIPPLE RINGS
-   Start invisible and small, animate outward on each inhale/exhale
-   ============================================= */
 
 .ring {
   position: absolute;
   border-radius: 50%;
   border: 1.5px solid #7F77DD;
-
-  /* start at same size as the resting circle */
-  width: 120px;
-  height: 120px;
+  width: 25vmin;
+  height: 25vmin;
   opacity: 0;
-
-  /* center them in the wrapper */
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(1);
-
+  transform: translate(-50%, -50%);  /* no scale here */
   pointer-events: none;
 }
 
-/* =============================================
-   LAYER 3: THE MAIN BREATHING CIRCLE (front)
-   Size and color change via JavaScript transitions
-   ============================================= */
-
 #breath-circle {
-  position: relative;       /* sits above canvas and rings */
+  position: relative;
   z-index: 2;
 
-  width: 120px;
-  height: 120px;
+  width: 25vmin;
+  height: 25vmin;
+  min-width: 8rem;
+  min-height: 8rem;
   border-radius: 50%;
   background-color: #AFA9EC;
 
@@ -87,7 +68,6 @@ body {
   justify-content: center;
   gap: 0.25rem;
 
-  /* smooth size and color transitions — duration set by JS per phase */
   transition: width 0s, height 0s, background-color 1s;
 }
 
@@ -103,11 +83,6 @@ body {
   color: rgba(255, 255, 255, 0.85);
   margin-top: 2px;
 }
-
-
-/* =============================================
-   TEXT AND BUTTONS BELOW THE CIRCLE
-   ============================================= */
 
 #message {
   font-size: 15px;

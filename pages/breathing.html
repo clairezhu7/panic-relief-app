@@ -1,10 +1,14 @@
+<head>
+  <link rel="stylesheet" href="breathing.css">
+</head>
+
 <div id="breathing-container">
 
   <!-- this wrapper holds the canvas, rings, and circle all stacked -->
   <div id="circle-wrapper">
 
     <!-- layer 1 (back): particles are drawn here -->
-    <canvas id="particle-canvas" width="260" height="260"></canvas>
+    <canvas id="particle-canvas"></canvas>
 
     <!-- layer 2 (middle): ripple rings that expand outward -->
     <div class="ring" id="ring1"></div>
@@ -32,3 +36,5 @@
   <audio id="music" src="assets/sounds/breathing_music.mp3" loop autoplay></audio>
 
 </div>
+
+<script src="breathing.js"></script>

@@ -1,0 +1,12 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left eye -->
+  <path d="M25 45 Q35 35, 45 45" stroke="#7F77DD" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="35" cy="50" r="3" fill="#7F77DD"/>
+
+  <!-- Right eye -->
+  <path d="M75 45 Q85 35, 95 45" stroke="#7F77DD" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="85" cy="50" r="3" fill="#7F77DD"/>
+
+  <!-- Smile -->
+  <path d="M40 75 Q60 85, 80 75" stroke="#9FE1CB" stroke-width="3" stroke-linecap="round" fill="none"/>
+</svg>

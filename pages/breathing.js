@@ -7,7 +7,7 @@ const TECHNIQUES = [
       { name: 'Exhale', duration: 4, id: 'exhale' },
       { name: 'Hold', duration: 4, id: 'hold-exhale' }],
     id: "box"
-  }, 
+  },
   {
     name: '4-7-8 Breathing',
     phases: [
@@ -33,7 +33,7 @@ const PHASES = SELECTED_TECHNIQUE.phases.map(phase => {
   const phaseConstant = PHASE_CONSTANTS.find(constant => constant.id === phase.id);
 
   return {
-    ... phase,
+    ...phase,
     ...phaseConstant
   }
 })
@@ -41,6 +41,16 @@ const PHASES = SELECTED_TECHNIQUE.phases.map(phase => {
 const TOTAL_CYCLES = 3 // modifiable
 const MID_CYCLE_MESSAGES = ['You got this.', 'Stay with it.', 'Almost there.']
 
+const music = document.getElementById('music')
+music.play().catch(() => {
+  document.addEventListener('click', () => {
+    music.play()
+  }, { once: true })
+})
+
+console.log('music element:', music)        // is it found?
+console.log('music src:', music.src)        // is the path correct?
+console.log('music readyState:', music.readyState)
 
 // =============================================
 // STATE
@@ -72,7 +82,6 @@ const rings = [
 ]
 const canvas = document.getElementById('particle-canvas')
 const ctx = canvas.getContext('2d')
-
 
 // =============================================
 // CIRCLE ANIMATION

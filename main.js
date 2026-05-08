@@ -7,9 +7,15 @@ app.commandLine.appendSwitch('enable-features', 'GlobalShortcutsPortal')
 
 let mainWindow = null
 
+const Store = require('electron-store')
+const storage = new Store()
+
 app.whenReady().then(() => {
-    ipcMain.handle('ping', () => 'pong')
-    ipcMain.on('open-main-window', (event, page) => createMainWindow(page))
+    // ipcMain.handle('ping', () => 'pong')
+    ipcMain.on('open-main-window', () => createMainWindow())
+
+    ipcMain.handle('storage-get', (event, key) => storage.get(key))
+    ipcMain.on('storage-set', (event, key, value) => storage.set(key, value))
 
     createBubble()
 
@@ -77,5 +83,7 @@ function createMainWindow() {
         }
     })
 
-    mainWindow.loadFile('main.html')
+    mainWindow.loadFile('main.html') //{query: {page: 'home'}}) default page
+    mainWindow.webContents.openDevTools()
+
 }

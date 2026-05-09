@@ -88,18 +88,22 @@ function isHoldPhase(phaseName) {
 }
 
 function resizeCanvas() {
-  const wrapper = document.getElementById('circle-wrapper')
-  canvas.width = wrapper.offsetWidth
-  canvas.height = wrapper.offsetHeight
+  const wrapper  = document.getElementById('circle-wrapper')
+  const overflow = Math.round(vminToPx(SIZE_LARGE) * 0.4)
 
-  // snap circle to correct size instantly (no transition during resize)
+  canvas.width  = wrapper.offsetWidth  + overflow * 2  // own line
+  canvas.height = wrapper.offsetHeight + overflow * 2  // own line
+
+  canvas.style.left = -overflow + 'px'
+  canvas.style.top  = -overflow + 'px'
+
   if (currentPhase) {
     circle.style.transition = 'none'
-    circle.style.width = currentPhase.size + 'vmin'
-    circle.style.height = currentPhase.size + 'vmin'
+    circle.style.width      = currentPhase.size + 'vmin'
+    circle.style.height     = currentPhase.size + 'vmin'
   }
 
-  particles = []  // clear particles so they respawn at correct positions
+  particles = []
 }
 
 resizeCanvas()
@@ -213,10 +217,13 @@ class Particle {
     const circleSizePx = currentPhase ? vminToPx(currentPhase.size) : vminToPx(SIZE_SMALL)
     const isHold = currentPhase && isHoldPhase(currentPhase.name)
 
-    // spawn just outside the circle edge
+    // gap scales proportionally with circle size instead of fixed pixels
+    const baseGap = circleSizePx * 0.1   // 15% of circle radius as base gap
+    const scatterSize = circleSizePx * 0.12   // scatter range also scales
+
     const scatter = isHold
-      ? Math.random() * 20 + 8   // hold: tight ring around edge
-      : Math.random() * 10 + 5   // active: small scatter
+      ? baseGap + Math.random() * scatterSize        // hold: ring just outside edge
+      : baseGap * 0.5 + Math.random() * scatterSize  // active: tighter to circle
 
     const radius = circleSizePx / 2 + scatter
     const angle = Math.random() * Math.PI * 2
@@ -229,7 +236,7 @@ class Particle {
     this.color = currentPhase ? currentPhase.color : '#AFA9EC'
     this.life = 1
     this.decay = isHold
-      ? Math.random() * 0.004 + 0.002  // slower decay during hold
+      ? Math.random() * 0.004 + 0.002
       : Math.random() * 0.008 + 0.004
   }
 

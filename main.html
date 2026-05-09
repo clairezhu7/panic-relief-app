@@ -3,10 +3,9 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" />
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
-    <title>Panic Relief App</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/44fe28e16d.js" crossorigin="anonymous"></script>
+    <title>Mindstep Relax</title>
 </head>
 
 <body>
@@ -15,8 +14,8 @@
     <script>
         // get local storage
 
-        const params = new URLSearchParams(window.location.search)
-        const page = params.get('page') || 'home'
+        const params = new URLSearchParams(window.location.search) // get URL
+        const page = params.get('page') || 'breathing'
 
 
         if (page === 'home') {

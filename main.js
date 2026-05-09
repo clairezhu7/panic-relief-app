@@ -27,7 +27,6 @@ app.whenReady().then(() => {
         }
     })
 
-
     const isKeyRegistered = globalShortcut.register('CommandOrControl+Shift+0', () => {
         console.log('Panic shortcut triggered');
         createMainWindow()
@@ -55,6 +54,9 @@ function createBubble() {
         resizable: false,
         skipTaskbar: true,      // won't appear in taskbar
         webPreferences: {
+            nodeIntegration: false,     // keep this off
+            contextIsolation: true,     // keep this on
+            sandbox: true,
             preload: path.join(__dirname, 'preload.js')
         }
     })
@@ -65,6 +67,10 @@ function createBubble() {
 
 function createMainWindow() {
     if (mainWindow && !mainWindow.isDestroyed()) {
+        if (mainWindow.isMinimized()) {
+            mainWindow.restore()
+        }
+        mainWindow.show()
         mainWindow.focus()
         return
     }
@@ -79,11 +85,13 @@ function createMainWindow() {
         alwaysOnTop: true,
         autoHideMenuBar: true,
         webPreferences: {
+            nodeIntegration: false,     // keep this off
+            contextIsolation: true,     // keep this on
+            sandbox: true,
             preload: path.join(__dirname, 'preload.js')
         }
     })
 
     mainWindow.loadFile('main.html') //{query: {page: 'home'}}) default page
     mainWindow.webContents.openDevTools()
-
 }

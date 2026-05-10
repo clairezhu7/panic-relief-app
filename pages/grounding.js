@@ -2,11 +2,26 @@
 
 // Auto-play background music
 const music = document.getElementById('music')
+const musicToggle = document.getElementById('music-toggle')
+let isMusicPlaying = true
+
 music.play().catch(() => {
   document.addEventListener('click', () => {
     music.play()
   }, { once: true })
 })
+
+function toggleMusic() {
+  if (isMusicPlaying) {
+    music.pause()
+    musicToggle.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>'
+    isMusicPlaying = false
+  } else {
+    music.play()
+    musicToggle.innerHTML = '<i class="fa-solid fa-music"></i>'
+    isMusicPlaying = true
+  }
+}
 
 const STEPS = [
   { sense: 'see', icon: 'assets/icons/smile-eyes.jpg', instruction: 'Find 5 things you can see', count: 5, description: 'Look around you. Name something you notice.' },
@@ -18,6 +33,7 @@ const STEPS = [
 
 let currentStepIndex = 0
 let currentItemIndex = 0
+let previousStepIndex = -1
 
 const introScreen = document.getElementById('intro-screen')
 const mainContent = document.getElementById('main-content')
@@ -52,12 +68,8 @@ function startExercise() {
   mainContent.style.display = 'flex'
   buttonRow.style.display = 'flex'
 
+  previousStepIndex = -1  // Ensure first display is a full update
   updateDisplay()
-
-  // Auto start listening after a brief delay
-  setTimeout(() => {
-    startListening()
-  }, 800)
 }
 
 async function startListening() {
@@ -159,6 +171,7 @@ function detectVoiceActivity() {
 
 function updateDisplay() {
   const step = STEPS[currentStepIndex]
+  const isSameSense = currentStepIndex === previousStepIndex
 
   // Stop listening when changing steps
   if (typeof isListening !== 'undefined' && isListening) {
@@ -170,6 +183,22 @@ function updateDisplay() {
   if (transcriptText) {
     transcriptText.textContent = ''
   }
+
+  if (isSameSense) {
+    // Only update counter if we're on the same sense
+    counter.textContent = `${currentItemIndex + 1} / ${step.count}`
+
+    // Auto start listening after brief delay
+    setTimeout(() => {
+      startListening()
+    }, 300)
+
+    updateProgress()
+    return
+  }
+
+  // Full update when changing to a new sense
+  previousStepIndex = currentStepIndex
 
   // Trigger animation by briefly removing and re-adding content
   icon.style.opacity = '0'
@@ -318,6 +347,7 @@ function resetGrounding() {
 
   currentStepIndex = 0
   currentItemIndex = 0
+  previousStepIndex = -1
 
   progressFill.style.width = '0%'
   nextBtn.disabled = false

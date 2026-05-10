@@ -11,8 +11,37 @@
 
   gap: 2rem;
   padding: 2rem;
-  
+
   background-color: #0f0f1a;
+  color: white;
+  position: relative;
+}
+
+/* Music toggle button */
+#music-toggle {
+  position: absolute;
+  top: 2.5rem;
+  right: 1rem;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-size: 1.2rem;
+  background: rgba(127, 119, 221, 0.5);
+  border: 1px solid rgba(127, 119, 221, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+#music-toggle:hover {
+  background: rgba(127, 119, 221, 0.7);
+  transform: scale(1.05);
+}
+
+#music-toggle i {
   color: white;
 }
 
@@ -54,6 +83,9 @@
 
 /* Progress bar */
 #progress-bar {
+  position: absolute;
+  top: 1rem;
+  left: 0;
   width: 100%;
   height: 6px;
   background-color: rgba(255, 255, 255, 0.1);
@@ -80,8 +112,9 @@
 }
 
 #sense-icon {
-  width: 120px;
-  height: 120px;
+  max-width: 240px;
+  max-height: 180px;
+  height: auto;
   margin-bottom: 0.5rem;
   animation: fadeIn 0.5s ease;
 }

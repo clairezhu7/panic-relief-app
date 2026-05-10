@@ -15,31 +15,23 @@
         // get local storage
 
         const params = new URLSearchParams(window.location.search) // get URL
-        const page = params.get('page') || 'breathing'
+        const page = params.get('page')
 
+        fetch(`pages/${page}.html`)
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('page').innerHTML = html
 
-        if (page === 'home') {
-            document.getElementById('page').innerHTML = `
-            <h1>What do you need?</h1>
-            <button onclick="window.electronAPI.navigate('breathing')">🫁 Breathing</button>
-            <button onclick="window.electronAPI.navigate('grounding')">🌱 Grounding</button>
-        `
-        } else {
-            fetch(`pages/${page}.html`)
-                .then(res => res.text())
-                .then(html => {
-                    document.getElementById('page').innerHTML = html
+                const css = document.createElement('link')
+                css.rel = 'stylesheet'
+                css.href = `pages/${page}.css`
+                document.head.appendChild(css)
 
-                    const css = document.createElement('link')
-                    css.rel = 'stylesheet'
-                    css.href = `pages/${page}.css`
-                    document.head.appendChild(css)
+                const script = document.createElement('script')
+                script.src = `pages/${page}.js`
+                document.body.appendChild(script)
 
-                    const script = document.createElement('script')
-                    script.src = `pages/${page}.js`
-                    document.body.appendChild(script)
-                })
-        }  
+            })
     </script>
 
     <script src="./renderer.js"></script>

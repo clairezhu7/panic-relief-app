@@ -16,7 +16,7 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background-color: rgba(127, 255, 212, 0.7);
+    background-color: rgba(127, 255, 212, 0.8);
     cursor: pointer;
 }
 
@@ -35,19 +35,19 @@ body {
     opacity: 80%;
 }
 
-.navigation-buttons {
+.navigation-menu {
     width: fit-content;
     display: flex;
     align-items: center;
     gap: clamp(0.5rem, 1.5vw, 2rem);
 
     position: fixed;
-    top: clamp(0.5rem, 5vmin, 2rem);
-    left: clamp(0.5rem, 4vmin, 2rem);
+    right: clamp(0.5rem, 5vmin, 2rem);
+    bottom: clamp(0.5rem, 4vmin, 2rem);
     z-index: 100;
 }
 
-.navigation-buttons button {
+.navigation-menu button {
     width: fit-content;
     height: fit-content;
     display: flex;
@@ -56,9 +56,10 @@ body {
     margin: 0;
     padding: 0;
     border: none;
+    background-color: transparent;
 }
 
-.navigation-buttons button i {
+.navigation-menu button i {
     font-size: clamp(1.8rem, 7vmin, 3.6rem);
-    color: whitesmoke;
+    color: white;
 }

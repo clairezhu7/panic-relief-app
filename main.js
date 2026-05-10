@@ -62,7 +62,7 @@ function createBubble() {
     })
 
     bubble.loadFile('bubble.html')
-    bubble.webContents.openDevTools({ mode: 'detach' })
+    // bubble.webContents.openDevTools({ mode: 'detach' })
 }
 
 function createMainWindow() {
@@ -92,6 +92,5 @@ function createMainWindow() {
         }
     })
 
-    mainWindow.loadFile('main.html') //{query: {page: 'home'}}) default page
-    mainWindow.webContents.openDevTools()
+    mainWindow.loadFile('main.html', {query: {page: 'home'}}) //{query: {page: 'home'}}) default page
 }

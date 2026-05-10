@@ -47,8 +47,8 @@ const nextBtn = document.getElementById('next-btn')
 const container = document.getElementById('grounding-container')
 const transcript = document.getElementById('transcript')
 const transcriptText = document.getElementById('transcript-text')
-// const waveformCanvas = document.getElementById('waveform')
-// const waveformCtx = waveformCanvas ? waveformCanvas.getContext('2d') : null
+const waveformCanvas = document.getElementById('waveform')
+const waveformCtx = waveformCanvas ? waveformCanvas.getContext('2d') : null
 
 // Voice Activity Detection setup (using volume instead of speech recognition)
 let isListening = false
@@ -59,9 +59,8 @@ let animationId = null
 let hasRecognitionError = false
 
 const VOLUME_THRESHOLD = 30 // Adjust sensitivity (0-255)
-const SPEECH_DURATION_MS = 1000 // How long user needs to speak
 let volumeHistory = []
-let speechStartTime = null
+
 
 function startExercise() {
   introScreen.style.display = 'none'
@@ -104,12 +103,36 @@ async function startListening() {
 
 function stopListening() {
   isListening = false
-  speechStartTime = null
   volumeHistory = []
 
   if (animationId) {
     cancelAnimationFrame(animationId)
     animationId = null
+  }
+
+  // Clear waveform
+  if (waveformCtx && waveformCanvas) {
+    waveformCtx.clearRect(0, 0, waveformCanvas.width, waveformCanvas.height)
+  }
+}
+
+function drawWaveform(dataArray) {
+  const width = waveformCanvas.width
+  const height = waveformCanvas.height
+  const barCount = 20
+  const barWidth = width / barCount
+  const step = Math.floor(dataArray.length / barCount)
+
+  waveformCtx.clearRect(0, 0, width, height)
+
+  for (let i = 2; i < barCount; i++) {  // Skip first bar (i=0)
+    const value = dataArray[i * step] || 0
+    const barHeight = (value / 255) * height * 0.8
+    const x = i * barWidth + barWidth * 0.2
+    const y = height - barHeight
+
+    waveformCtx.fillStyle = '#9FE1CB'
+    waveformCtx.fillRect(x, y, barWidth * 0.6, barHeight)
   }
 }
 
@@ -124,6 +147,11 @@ function detectVoiceActivity() {
   const bufferLength = analyser.frequencyBinCount
   const dataArray = new Uint8Array(bufferLength)
   analyser.getByteFrequencyData(dataArray)
+
+  // Draw waveform
+  if (waveformCtx && waveformCanvas) {
+    drawWaveform(dataArray)
+  }
 
   // Calculate average volume
   let sum = 0
@@ -140,30 +168,11 @@ function detectVoiceActivity() {
 
   const recentAverage = volumeHistory.reduce((a, b) => a + b, 0) / volumeHistory.length
 
-  // Detect speech
+  // Update text based on volume (no auto-advance)
   if (recentAverage > VOLUME_THRESHOLD) {
-    if (!speechStartTime) {
-      speechStartTime = Date.now()
-      transcriptText.textContent = 'Speaking detected...'
-    } else {
-      const duration = Date.now() - speechStartTime
-      if (duration >= SPEECH_DURATION_MS) {
-        transcriptText.textContent = 'Got it!'
-
-        // Stop listening before moving to next
-        stopListening()
-
-        setTimeout(() => {
-          nextItem()
-        }, 800)
-      }
-    }
+    transcriptText.textContent = 'Speaking detected...'
   } else {
-    // Reset if volume drops
-    if (speechStartTime && Date.now() - speechStartTime < SPEECH_DURATION_MS) {
-      speechStartTime = null
-      transcriptText.textContent = 'Speak naturally...'
-    }
+    transcriptText.textContent = 'Speak naturally...'
   }
 }
 
@@ -278,7 +287,6 @@ function nextItem() {
 
   // Reset error state when moving to next item
   hasRecognitionError = false
-  speechStartTime = null
   volumeHistory = []
 
   currentItemIndex++
@@ -337,7 +345,6 @@ function resetGrounding() {
 
   // Reset error states
   hasRecognitionError = false
-  speechStartTime = null
   volumeHistory = []
 
   // Return to intro screen

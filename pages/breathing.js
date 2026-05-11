@@ -21,7 +21,6 @@ const TECHNIQUES = [
   },
 ]
 
-// visual properties per phase type
 const PHASE_CONSTANTS = [
   { id: 'inhale', size: 45, color: '#7F77DD' },
   { id: 'hold-inhale', size: 45, color: '#534AB7' },
@@ -29,6 +28,125 @@ const PHASE_CONSTANTS = [
   { id: 'hold-exhale', size: 25, color: '#1D9E75' },
 ]
 
+var selectedID
+var numCycles = 3
+var selectedTechnique
+var phases
+
+// const MID_CYCLE_MESSAGES = ['You got this.', 'Stay with it.', 'Almost there.']
+
+
+// merge phase timing with phase visual constants
+
+setDefaultTechnique()
+
+function setDefaultTechnique() {
+  // get from localstorage
+  updateTechnique('478')
+}
+
+
+// dropdown
+const techniqueDropdown = document.getElementById('technique-dropdown')
+const dropdownSelected = document.getElementById('dropdown-selected')
+const dropdownLabel = document.getElementById('selected-option')
+const dropdownArrow = document.getElementById('dropdown-arrow')
+const dropdownOptions = document.getElementById('dropdown-options')
+
+document.body.appendChild(dropdownOptions)
+
+function measureDropdownHeight() {
+  dropdownOptions.style.display = 'block'
+  dropdownOptions.style.visibility = 'hidden'
+  dropdownOptions.style.maxHeight = 'none'
+  dropdownOptions.style.height = 'auto'
+  dropdownOptions.style.overflow = 'visible'
+
+  const h = dropdownOptions.offsetHeight
+
+  dropdownOptions.style.display = ''
+  dropdownOptions.style.visibility = ''
+  dropdownOptions.style.maxHeight = ''
+  dropdownOptions.style.height = ''
+  dropdownOptions.style.overflow = ''
+
+  return h
+}
+
+let DROPDOWN_HEIGHT = measureDropdownHeight()
+
+window.addEventListener('resize', () => {
+  DROPDOWN_HEIGHT = measureDropdownHeight()
+})
+
+dropdownSelected.addEventListener('click', () => {
+  if (running) return
+
+  const isAlreadyOpen = dropdownOptions.classList.contains('open')
+  dropdownArrow.classList.toggle('open', !isAlreadyOpen)
+
+  if (isAlreadyOpen) {
+    dropdownOptions.classList.remove('open')
+    return
+  }
+
+  const rect = dropdownSelected.getBoundingClientRect()
+  const spaceBelow = window.innerHeight - rect.bottom
+  const fitsBelow = spaceBelow >= DROPDOWN_HEIGHT
+
+  dropdownOptions.style.position = 'fixed'
+  dropdownOptions.style.width = rect.width + 'px'
+  dropdownOptions.style.left = rect.left + 'px'
+  dropdownOptions.style.top = 'auto'
+  dropdownOptions.style.bottom = 'auto'
+
+  if (fitsBelow) {
+    dropdownOptions.style.top = rect.bottom + 6 + 'px'
+  } else {
+    dropdownOptions.style.bottom = (window.innerHeight - rect.top + 6) + 'px'
+  }
+
+  console.log('DROPDOWN_HEIGHT:', DROPDOWN_HEIGHT)
+  console.log('spaceBelow:', spaceBelow)
+  console.log('fitsBelow:', fitsBelow)
+
+  dropdownOptions.classList.add('open')
+})
+
+document.addEventListener('click', e => {
+  if (!techniqueDropdown.contains(e.target) && !dropdownOptions.contains(e.target)) {
+    dropdownOptions.classList.remove('open')
+    dropdownArrow.classList.remove('open')
+  }
+})
+
+document.querySelectorAll('.dropdown-option').forEach(option => {
+  option.addEventListener('click', () => {
+    if (running) return
+
+    selectedId = option.dataset.id
+    dropdownLabel.textContent = option.textContent
+
+    document.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('active'))
+    option.classList.add('active')
+
+    dropdownOptions.classList.remove('open')
+    dropdownArrow.classList.remove('open')
+
+    updateTechnique(selectedID)
+  })
+})
+
+function updateTechnique(techniqueID) {
+  selectedID = techniqueID
+  selectedTechnique = TECHNIQUES.find(t => t.id === selectedID)
+  phases = selectedTechnique.phases.map(phase => ({
+    ...phase,
+    ...PHASE_CONSTANTS.find(c => c.id === phase.id)
+  }))
+}
+
+// animation
 const SIZE_SMALL = 25   // vmin — resting / exhale size
 const SIZE_LARGE = 45   // vmin — inhale size
 
@@ -36,21 +154,6 @@ const RING_START_INHALE = SIZE_SMALL   // rings start here on inhale (matching c
 const RING_END_INHALE = 70           // rings expand to here on inhale
 const RING_START_EXHALE = 70           // rings start here on exhale (spread out)
 const RING_END_EXHALE = SIZE_SMALL   // rings shrink to here on exhale
-
-
-
-const SELECTED_ID = '478'
-const TOTAL_CYCLES = 3
-const MID_CYCLE_MESSAGES = ['You got this.', 'Stay with it.', 'Almost there.']
-
-const SELECTED_TECHNIQUE = TECHNIQUES.find(t => t.id === SELECTED_ID)
-
-// merge phase timing with phase visual constants
-const PHASES = SELECTED_TECHNIQUE.phases.map(phase => ({
-  ...phase,
-  ...PHASE_CONSTANTS.find(c => c.id === phase.id)
-}))
-
 
 let phaseIndex = 0
 let cycleCount = 0
@@ -67,8 +170,8 @@ const circle = document.getElementById('breath-circle')
 const phaseText = document.getElementById('phase-text')
 const countdown = document.getElementById('countdown')
 const cycleLabel = document.getElementById('cycle-label')
-const message = document.getElementById('message')
-const startBtn = document.getElementById('start-btn')
+// const message = document.getElementById('message')
+// const startBtn = document.getElementById('start-btn')
 const canvas = document.getElementById('particle-canvas')
 const ctx = canvas.getContext('2d')
 const rings = [
@@ -77,6 +180,10 @@ const rings = [
   document.getElementById('ring3'),
 ]
 
+circle.addEventListener('click', handleCircleClick)
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') handleCircleClick()
+})
 // convert vmin to pixels based on current screen size
 function vminToPx(vmin) {
   return vmin * Math.min(window.innerWidth, window.innerHeight) / 100
@@ -88,19 +195,19 @@ function isHoldPhase(phaseName) {
 }
 
 function resizeCanvas() {
-  const wrapper  = document.getElementById('circle-wrapper')
+  const wrapper = document.getElementById('circle-wrapper')
   const overflow = Math.round(vminToPx(SIZE_LARGE) * 0.4)
 
-  canvas.width  = wrapper.offsetWidth  + overflow * 2  // own line
+  canvas.width = wrapper.offsetWidth + overflow * 2  // own line
   canvas.height = wrapper.offsetHeight + overflow * 2  // own line
 
   canvas.style.left = -overflow + 'px'
-  canvas.style.top  = -overflow + 'px'
+  canvas.style.top = -overflow + 'px'
 
   if (currentPhase) {
     circle.style.transition = 'none'
-    circle.style.width      = currentPhase.size + 'vmin'
-    circle.style.height     = currentPhase.size + 'vmin'
+    circle.style.width = currentPhase.size + 'vmin'
+    circle.style.height = currentPhase.size + 'vmin'
   }
 
   particles = []
@@ -316,17 +423,17 @@ function tick() {
   if (secondsLeft <= 0) {
     phaseIndex++
 
-    if (phaseIndex >= PHASES.length) {
+    if (phaseIndex >= phases.length) {
       phaseIndex = 0
       cycleCount++
 
-      if (cycleCount >= TOTAL_CYCLES) { finish(); return }
+      if (cycleCount >= numCycles) { finish(); return }
 
-      message.textContent = MID_CYCLE_MESSAGES[cycleCount] || ''
-      cycleLabel.textContent = `Cycle ${cycleCount + 1} of ${TOTAL_CYCLES}`
+      // message.textContent = MID_CYCLE_MESSAGES[cycleCount] || ''
+      cycleLabel.textContent = `Cycle ${cycleCount + 1} of ${numCycles}`
     }
 
-    const nextPhase = PHASES[phaseIndex]
+    const nextPhase = phases[phaseIndex]
     secondsLeft = nextPhase.duration
     applyPhase(nextPhase)
     countdown.textContent = secondsLeft + 's'
@@ -338,13 +445,14 @@ function startBreathing() {
   running = true
   phaseIndex = 0
   cycleCount = 0
-  secondsLeft = PHASES[0].duration
-  startBtn.disabled = true
+  secondsLeft = phases[0].duration
+  // startBtn.disabled = true
 
-  applyPhase(PHASES[0])
+  applyPhase(phases[0])
   countdown.textContent = secondsLeft + 's'
-  cycleLabel.textContent = `Cycle 1 of ${TOTAL_CYCLES}`
-  message.textContent = ''
+  cycleLabel.textContent = `Cycle 1 of ${numCycles}`
+  // message.textContent = ''
+  techniqueDropdown.classList.add('disabled')
 
   startParticles()
   ticker = setInterval(tick, 1000)
@@ -363,8 +471,9 @@ function finish() {
   phaseText.textContent = 'Done'
   countdown.textContent = ''
   cycleLabel.textContent = ''
-  message.textContent = 'Well done. Take a moment.'
-  startBtn.disabled = false
+  // message.textContent = 'Well done. Take a moment.'
+  // startBtn.disabled = false
+  techniqueDropdown.classList.remove('disabled')
 }
 
 function resetBreathing() {
@@ -382,17 +491,43 @@ function resetBreathing() {
   circle.style.width = SIZE_SMALL + 'vmin'
   circle.style.height = SIZE_SMALL + 'vmin'
   circle.style.backgroundColor = '#AFA9EC'
+  circle.style.cursor = "pointer"
 
-  phaseText.textContent = 'Press start'
+  phaseText.textContent = 'Start'
   countdown.textContent = ''
   cycleLabel.textContent = ''
-  message.textContent = SELECTED_TECHNIQUE.name
+  // message.textContent = selectedTechnique.name
+  techniqueDropdown.classList.remove('disabled')
 
   rings.forEach(r => { r.style.opacity = '0' })
-  startBtn.disabled = false
+  // startBtn.disabled = false
+}
+
+function handleCircleClick() {
+  if (!running) {
+    startBreathing()
+    circle.style.cursor = "default"
+  }
 }
 
 const music = document.getElementById('music')
+const musicToggle = document.getElementById('music-toggle')
+let isMusicPlaying = true
+
 music.play().catch(() => {
-  document.addEventListener('click', () => music.play(), { once: true })
+  document.addEventListener('click', () => {
+    music.play()
+  }, { once: true })
 })
+
+function toggleMusic() {
+  if (isMusicPlaying) {
+    music.pause()
+    musicToggle.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>'
+    isMusicPlaying = false
+  } else {
+    music.play()
+    musicToggle.innerHTML = '<i class="fa-solid fa-music"></i>'
+    isMusicPlaying = true
+  }
+}

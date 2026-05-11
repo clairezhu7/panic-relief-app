@@ -4,17 +4,33 @@
 
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
   flex-direction: column;
   box-sizing: border-box;
   overflow: hidden;
 
-  gap: 2rem;
-  padding: 2rem;
+  padding: 1.5rem;
 
   background-color: #0f0f1a;
   color: white;
   position: relative;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-height: 900px) {
+  #grounding-container {
+    padding: 1rem;
+    justify-content: center;
+    gap: 1rem;
+  }
+}
+
+@media (max-height: 700px) {
+  #grounding-container {
+    padding: 0.75rem;
+    justify-content: center;
+    gap: 0.5rem;
+  }
 }
 
 /* Music toggle button */
@@ -45,6 +61,24 @@
   color: white;
 }
 
+@media (max-height: 900px) {
+  #music-toggle {
+    top: 2rem;
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-height: 700px) {
+  #music-toggle {
+    top: 1.5rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+}
+
 /* Intro screen */
 #intro-screen {
   display: flex;
@@ -69,6 +103,36 @@
   margin: 0;
 }
 
+@media (max-height: 900px) {
+  #intro-screen {
+    gap: 1.5rem;
+  }
+
+  #intro-screen h1 {
+    font-size: 1.8rem;
+  }
+
+  #intro-text {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+}
+
+@media (max-height: 700px) {
+  #intro-screen {
+    gap: 1rem;
+  }
+
+  #intro-screen h1 {
+    font-size: 1.5rem;
+  }
+
+  #intro-text {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
 #start-btn {
   margin-top: 1rem;
   padding: 14px 40px;
@@ -81,6 +145,22 @@
   background: rgba(127, 119, 221, 0.4);
 }
 
+@media (max-height: 900px) {
+  #start-btn {
+    margin-top: 0.75rem;
+    padding: 12px 36px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-height: 700px) {
+  #start-btn {
+    margin-top: 0.5rem;
+    padding: 10px 32px;
+    font-size: 0.95rem;
+  }
+}
+
 /* Progress bar */
 #progress-bar {
   position: absolute;
@@ -91,6 +171,20 @@
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
   overflow: hidden;
+}
+
+@media (max-height: 900px) {
+  #progress-bar {
+    top: 0.75rem;
+    height: 5px;
+  }
+}
+
+@media (max-height: 700px) {
+  #progress-bar {
+    top: 0.5rem;
+    height: 4px;
+  }
 }
 
 #progress-fill {
@@ -107,16 +201,41 @@
   align-items: center;
   gap: 1rem;
   text-align: center;
-  min-height: 280px;
   justify-content: center;
 }
 
+@media (max-height: 900px) {
+  #main-content {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-height: 700px) {
+  #main-content {
+    gap: 0.5rem;
+  }
+}
+
 #sense-icon {
-  max-width: 240px;
-  max-height: 180px;
+  max-width: min(240px, 40vw);
+  max-height: min(180px, 20vh);
   height: auto;
   margin-bottom: 0.5rem;
   animation: fadeIn 0.5s ease;
+}
+
+@media (max-height: 900px) {
+  #sense-icon {
+    max-width: min(200px, 35vw);
+    max-height: min(150px, 18vh);
+  }
+}
+
+@media (max-height: 700px) {
+  #sense-icon {
+    max-width: min(160px, 30vw);
+    max-height: min(120px, 15vh);
+  }
 }
 
 /* For emoji icons */
@@ -124,6 +243,18 @@
   font-size: 4rem;
   width: auto;
   height: auto;
+}
+
+@media (max-height: 900px) {
+  #sense-icon.emoji-icon {
+    font-size: 3.5rem;
+  }
+}
+
+@media (max-height: 700px) {
+  #sense-icon.emoji-icon {
+    font-size: 3rem;
+  }
 }
 
 h2 {
@@ -141,6 +272,28 @@ h2 {
   animation: fadeIn 0.5s ease;
 }
 
+@media (max-height: 900px) {
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  #counter {
+    font-size: 2.5rem;
+    margin: 0.25rem 0;
+  }
+}
+
+@media (max-height: 700px) {
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  #counter {
+    font-size: 2rem;
+    margin: 0.25rem 0;
+  }
+}
+
 #description {
   font-size: 1rem;
   opacity: 0.7;
@@ -148,8 +301,20 @@ h2 {
   animation: fadeIn 0.5s ease;
 }
 
+@media (max-height: 900px) {
+  #description {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-height: 700px) {
+  #description {
+    font-size: 0.85rem;
+  }
+}
+
 #transcript {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   padding: 0.75rem 1.5rem;
   min-height: 60px;
   border-radius: 8px;
@@ -163,6 +328,24 @@ h2 {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+}
+
+@media (max-height: 900px) {
+  #transcript {
+    margin-top: 0.25rem;
+    padding: 0.5rem 1rem;
+    min-height: 50px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-height: 700px) {
+  #transcript {
+    margin-top: 0;
+    padding: 0.5rem 1rem;
+    min-height: 40px;
+    font-size: 0.8rem;
+  }
 }
 
 #transcript.active {
@@ -179,6 +362,12 @@ h2 {
   display: block;
 }
 
+@media (max-height: 700px) {
+  #waveform {
+    transform: scale(0.8);
+  }
+}
+
 #transcript-text {
   text-align: center;
 }
@@ -187,6 +376,13 @@ h2 {
 #button-row {
   display: flex;
   gap: 10px;
+  margin-top: 0.5rem;
+}
+
+@media (max-height: 900px) {
+  #button-row {
+    margin-top: 0.25rem;
+  }
 }
 
 button {
@@ -208,6 +404,20 @@ button:hover {
 button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+@media (max-height: 900px) {
+  button {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+}
+
+@media (max-height: 700px) {
+  button {
+    padding: 6px 16px;
+    font-size: 12px;
+  }
 }
 
 

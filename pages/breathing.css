@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 3vh;
 
   background-color: #0f0f1a;
   color: white;
@@ -52,8 +52,8 @@
 
   width: 25vmin;
   height: 25vmin;
-  min-width: 8rem;
-  min-height: 8rem;
+  min-width: 10rem;
+  min-height: 10rem;
   border-radius: 50%;
   background-color: #AFA9EC;
 
@@ -61,57 +61,180 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  /* gap: 1vmin; */
 
+  cursor: pointer;
   transition: width 0s, height 0s, background-color 1s;
 }
 
 #phase-text {
-  font-size: 1.8rem;
+  font-size: clamp(2rem, 6vmin, 10rem);
   font-weight: 400;
   color: white;
   user-select: none;
 }
 
 #countdown {
-  font-size: 1rem;
+  font-size: clamp(0.8rem, 4.5vmin, 8rem);
   color: rgba(255, 255, 255, 0.85);
   margin-top: 2px;
 }
-
+/* 
 #message {
   font-size: 15px;
   font-weight: 500;
   min-height: 22px;
   text-align: center;
-}
+} */
 
 #cycle-label {
-  font-size: 13px;
+  font-size: clamp(1rem, 3vmin, 3rem);
   opacity: 0.6;
   text-align: center;
 }
-
+/* 
 #button-row {
   display: flex;
   gap: 10px;
-}
+} */
 
-button {
-  padding: 8px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+#reset-button {
+  width: clamp(8rem, 20vw, 12rem);
+  aspect-ratio: 3;
+  border: 0.15rem solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.5rem;
   background: transparent;
   color: white;
-  font-size: 13px;
+  font-size: clamp(1rem, 2.8vw, 2rem);
   cursor: pointer;
 }
 
-button:hover {
+#reset-button:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
-button:disabled {
+#reset-button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+#technique-dropdown {
+  position: relative;
+  width: clamp(15rem, 35vw, 25rem);
+  user-select: none;
+  margin-top: 0.5rem;
+}
+
+#technique-dropdown.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+#dropdown-selected {
+  aspect-ratio: 6.5;
+  container-type: size;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0.5rem 0.9rem;
+  border: 0.1rem solid #7F77DD;
+  border-radius: 0.8rem;
+  background: rgba(127, 119, 221, 0.3);
+
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+#selected-option {
+  font-size: 60cqh;
+  color: white;
+}
+
+#dropdown-selected:hover {
+  border-color: rgba(127, 119, 221, 0.5);
+}
+
+#dropdown-arrow {
+  font-size: 11px;
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+#dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+#dropdown-options {
+  width: 100%;
+  position: absolute; /* JS will override to fixed anyway */
+  /* remove top and bottom from here */
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.6rem;
+  overflow: hidden;
+  display: none;
+  z-index: 100;
+}
+
+#dropdown-options.open {
+  display: block;
+}
+
+.dropdown-option {
+  aspect-ratio: 8;
+  container-type: size;
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.dropdown-option span {
+  font-size: 60cqh;
+  color: rgba(255, 255, 255, 0.8);
+
+}
+
+.dropdown-option:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.dropdown-option:hover span {
+  color: white;
+}
+
+.dropdown-option.active {
+  background: rgb(15, 15, 33);
+}
+
+.dropdown-option.active span {
+  color: white;
+}
+
+#music-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: clamp(2rem, 10vmin, 4rem);
+  aspect-ratio: 1;
+  padding: 0;
+  font-size: clamp(1rem, 4.5vmin, 3rem);
+  background: rgba(127, 119, 221, 0.5);
+  border: 1px solid rgba(127, 119, 221, 0.8);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+#music-toggle:hover {
+  background: rgba(127, 119, 221, 0.7);
+  transform: scale(1.05);
+}
+
+#music-toggle i {
+  color: white;
 }

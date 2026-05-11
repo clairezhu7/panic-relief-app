@@ -1,12 +1,22 @@
+<!-- <head>
+  <link rel="stylesheet" href="breathing.css">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://kit.fontawesome.com/44fe28e16d.js" crossorigin="anonymous"></script>
+</head> -->
+
 <div class="navigation-menu">
   <button id="home-button" onclick="window.electronAPI.navigate('home')">
     <i class="fa-solid fa-house"></i>
   </button>
 
-  <button id="settings-button" onclick="window.electronAPI.navigate('settings')">
+  <!-- <button id="settings-button" onclick="window.electronAPI.navigate('settings')">
     <i class="fa fa-cog" aria-hidden="true"></i>
-  </button>
+  </button> -->
 </div>
+
+<button id="music-toggle" onclick="toggleMusic()" aria-label="Toggle music">
+  <i class="fa-solid fa-music"></i>
+</button>
 
 <div id="breathing-container">
 
@@ -22,25 +32,47 @@
     <div class="ring" id="ring3"></div>
 
     <!-- layer 3 (front): the main breathing circle -->
-    <div id="breath-circle">
-      <div id="phase-text"></div>
+    <div id="breath-circle" role="button">
+      <div id="phase-text">Start</div>
       <div id="countdown"></div>
     </div>
 
   </div>
 
   <!-- text below the circle -->
-  <div id="message">Box breathing — 4 counts each phase</div>
+  <div id="technique-dropdown">
+
+    <!-- set default!! -->
+    <div id="dropdown-selected">
+      <span id="selected-option">Box Breathing</span>
+      <i id="dropdown-arrow" class="fa-solid fa-chevron-down"></i>
+    </div>
+
+    <div id="dropdown-options">
+
+      <div class="dropdown-option active" data-id="box">
+        <span>Box Breathing</span>
+      </div>
+
+      <div class="dropdown-option" data-id="478">
+        <span>4-7-8 Breathing</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- <div id="message">Box breathing — 4 counts each phase</div> -->
   <div id="cycle-label"></div>
 
   <!-- buttons -->
-  <div id="button-row">
-    <button id="start-btn" onclick="startBreathing()">Start</button>
-    <button onclick="resetBreathing()">Reset</button>
-  </div>
+  <!-- <div id="button-row"> -->
+  <!-- <button id="start-btn" onclick="startBreathing()">Start</button> -->
+  <button id="reset-button" onclick="resetBreathing()">Reset</button>
+  <!-- </div> -->
 
   <audio id="music" src="assets/sounds/breathing_music.mp3" loop autoplay></audio>
 
 </div>
 
-<script src="breathing.js"></script>
+<!-- <script src="breathing.js"></script> -->

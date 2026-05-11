@@ -93,6 +93,6 @@ function createMainWindow() {
     })
 
     mainWindow.loadFile('main.html', { query: { page: 'home' } }) //{query: {page: 'home'}}) default page
-    mainWindow.webContents.openDevTools({ mode: 'detach' })
+    // mainWindow.webContents.openDevTools({ mode: 'detach' })
 
 }

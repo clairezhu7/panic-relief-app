@@ -20,18 +20,14 @@
 
 <div id="breathing-container">
 
-  <!-- this wrapper holds the canvas, rings, and circle all stacked -->
   <div id="circle-wrapper">
 
-    <!-- layer 1 (back): particles are drawn here -->
     <canvas id="particle-canvas"></canvas>
 
-    <!-- layer 2 (middle): ripple rings that expand outward -->
     <div class="ring" id="ring1"></div>
     <div class="ring" id="ring2"></div>
     <div class="ring" id="ring3"></div>
 
-    <!-- layer 3 (front): the main breathing circle -->
     <div id="breath-circle" role="button">
       <div id="phase-text">Start</div>
       <div id="countdown"></div>
@@ -39,10 +35,8 @@
 
   </div>
 
-  <!-- text below the circle -->
   <div id="technique-dropdown">
 
-    <!-- set default!! -->
     <div id="dropdown-selected">
       <span id="selected-option">Box Breathing</span>
       <i id="dropdown-arrow" class="fa-solid fa-chevron-down"></i>
@@ -62,14 +56,9 @@
 
   </div>
 
-  <!-- <div id="message">Box breathing — 4 counts each phase</div> -->
   <div id="cycle-label"></div>
 
-  <!-- buttons -->
-  <!-- <div id="button-row"> -->
-  <!-- <button id="start-btn" onclick="startBreathing()">Start</button> -->
   <button id="reset-button" onclick="resetBreathing()">Reset</button>
-  <!-- </div> -->
 
   <audio id="music" src="assets/sounds/breathing_music.mp3" loop autoplay></audio>
 

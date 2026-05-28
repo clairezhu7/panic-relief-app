@@ -33,11 +33,6 @@ var numCycles = 3
 var selectedTechnique
 var phases
 
-// const MID_CYCLE_MESSAGES = ['You got this.', 'Stay with it.', 'Almost there.']
-
-
-// merge phase timing with phase visual constants
-
 setDefaultTechnique()
 
 function setDefaultTechnique() {
@@ -146,14 +141,13 @@ function updateTechnique(techniqueID) {
   }))
 }
 
-// animation
-const SIZE_SMALL = 25   // vmin — resting / exhale size
-const SIZE_LARGE = 45   // vmin — inhale size
+const SIZE_SMALL = 25
+const SIZE_LARGE = 45
 
-const RING_START_INHALE = SIZE_SMALL   // rings start here on inhale (matching circle)
-const RING_END_INHALE = 70           // rings expand to here on inhale
-const RING_START_EXHALE = 70           // rings start here on exhale (spread out)
-const RING_END_EXHALE = SIZE_SMALL   // rings shrink to here on exhale
+const RING_START_INHALE = SIZE_SMALL
+const RING_END_INHALE = 70
+const RING_START_EXHALE = 70
+const RING_END_EXHALE = SIZE_SMALL 
 
 let phaseIndex = 0
 let cycleCount = 0
@@ -170,8 +164,6 @@ const circle = document.getElementById('breath-circle')
 const phaseText = document.getElementById('phase-text')
 const countdown = document.getElementById('countdown')
 const cycleLabel = document.getElementById('cycle-label')
-// const message = document.getElementById('message')
-// const startBtn = document.getElementById('start-btn')
 const canvas = document.getElementById('particle-canvas')
 const ctx = canvas.getContext('2d')
 const rings = [
@@ -184,12 +176,11 @@ circle.addEventListener('click', handleCircleClick)
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ' ') handleCircleClick()
 })
-// convert vmin to pixels based on current screen size
+
 function vminToPx(vmin) {
   return vmin * Math.min(window.innerWidth, window.innerHeight) / 100
 }
 
-// are we in a hold/pause phase?
 function isHoldPhase(phaseName) {
   return phaseName === 'Hold' || phaseName === 'Pause'
 }
@@ -198,8 +189,8 @@ function resizeCanvas() {
   const wrapper = document.getElementById('circle-wrapper')
   const overflow = Math.round(vminToPx(SIZE_LARGE) * 0.4)
 
-  canvas.width = wrapper.offsetWidth + overflow * 2  // own line
-  canvas.height = wrapper.offsetHeight + overflow * 2  // own line
+  canvas.width = wrapper.offsetWidth + overflow * 2 
+  canvas.height = wrapper.offsetHeight + overflow * 2  
 
   canvas.style.left = -overflow + 'px'
   canvas.style.top = -overflow + 'px'
@@ -244,7 +235,6 @@ function applyPhase(phase) {
   } else if (phase.name === 'Exhale') {
     fireRipple(phase.color, 'in', phase.duration, RING_START_EXHALE, RING_END_EXHALE)
   } else {
-    // hold / pause — cancel rings and fade them out
     rippleTimers.forEach(t => clearTimeout(t))
     rippleTimers = []
     rings.forEach(r => {
@@ -267,7 +257,6 @@ function fireRipple(color, direction, duration, startVmin, endVmin) {
     const delayMs = index * (direction === 'out' ? inhaleStagger : exhaleStagger)
     const remainingSecs = duration - (delayMs / 1000)
 
-    // always reset ring before animating
     ring.style.transition = 'none'
     ring.style.width = startVmin + 'vmin'
     ring.style.height = startVmin + 'vmin'
@@ -277,7 +266,6 @@ function fireRipple(color, direction, duration, startVmin, endVmin) {
 
     const timer = setTimeout(() => {
       if (direction === 'out') {
-        // inhale: snap visible then expand outward
         ring.style.transition = 'none'
         ring.style.opacity = String(0.55 - index * 0.1)
 
@@ -289,10 +277,9 @@ function fireRipple(color, direction, duration, startVmin, endVmin) {
         }, 20)
 
       } else {
-        // exhale: pre-spread rings at different sizes, fade in softly then shrink
         const spreadStep = 6
-        const ringStartVmin = startVmin - (index * spreadStep)  // 70, 64, 58
-        const startOpacity = 0.55 - (index * 0.12)             // 0.55, 0.43, 0.31
+        const ringStartVmin = startVmin - (index * spreadStep)
+        const startOpacity = 0.55 - (index * 0.12)
 
         ring.style.transition = 'none'
         ring.style.width = ringStartVmin + 'vmin'
@@ -324,13 +311,12 @@ class Particle {
     const circleSizePx = currentPhase ? vminToPx(currentPhase.size) : vminToPx(SIZE_SMALL)
     const isHold = currentPhase && isHoldPhase(currentPhase.name)
 
-    // gap scales proportionally with circle size instead of fixed pixels
-    const baseGap = circleSizePx * 0.1   // 15% of circle radius as base gap
-    const scatterSize = circleSizePx * 0.12   // scatter range also scales
+    const baseGap = circleSizePx * 0.1
+    const scatterSize = circleSizePx * 0.12 
 
     const scatter = isHold
-      ? baseGap + Math.random() * scatterSize        // hold: ring just outside edge
-      : baseGap * 0.5 + Math.random() * scatterSize  // active: tighter to circle
+      ? baseGap + Math.random() * scatterSize
+      : baseGap * 0.5 + Math.random() * scatterSize 
 
     const radius = circleSizePx / 2 + scatter
     const angle = Math.random() * Math.PI * 2
@@ -356,19 +342,16 @@ class Particle {
     const phaseName = currentPhase ? currentPhase.name : ''
 
     if (isHoldPhase(phaseName)) {
-      // barely drift — tiny random nudge with strong drag
       this.vx += (Math.random() - 0.5) * 0.015
       this.vy += (Math.random() - 0.5) * 0.015
       this.vx *= 0.90
       this.vy *= 0.90
     } else if (phaseName === 'Inhale') {
-      // pull toward center
       this.vx += (dx / dist) * 0.12
       this.vy += (dy / dist) * 0.12
       this.vx *= 0.96
       this.vy *= 0.96
     } else {
-      // push away from center
       this.vx += (dx / dist) * -0.08
       this.vy += (dy / dist) * -0.08
       this.vx *= 0.96
@@ -429,7 +412,7 @@ function tick() {
 
       if (cycleCount >= numCycles) { finish(); return }
 
-      // message.textContent = MID_CYCLE_MESSAGES[cycleCount] || ''
+
       cycleLabel.textContent = `Cycle ${cycleCount + 1} of ${numCycles}`
     }
 
@@ -446,12 +429,10 @@ function startBreathing() {
   phaseIndex = 0
   cycleCount = 0
   secondsLeft = phases[0].duration
-  // startBtn.disabled = true
 
   applyPhase(phases[0])
   countdown.textContent = secondsLeft + 's'
   cycleLabel.textContent = `Cycle 1 of ${numCycles}`
-  // message.textContent = ''
   techniqueDropdown.classList.add('disabled')
 
   startParticles()
@@ -471,8 +452,6 @@ function finish() {
   phaseText.textContent = 'Done'
   countdown.textContent = ''
   cycleLabel.textContent = ''
-  // message.textContent = 'Well done. Take a moment.'
-  // startBtn.disabled = false
   techniqueDropdown.classList.remove('disabled')
 }
 
@@ -496,11 +475,9 @@ function resetBreathing() {
   phaseText.textContent = 'Start'
   countdown.textContent = ''
   cycleLabel.textContent = ''
-  // message.textContent = selectedTechnique.name
   techniqueDropdown.classList.remove('disabled')
 
   rings.forEach(r => { r.style.opacity = '0' })
-  // startBtn.disabled = false
 }
 
 function handleCircleClick() {

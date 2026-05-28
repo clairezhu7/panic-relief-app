@@ -48,21 +48,20 @@ function createBubble() {
         height: 70,
         x: width - 100,
         y: height - 100,
-        alwaysOnTop: true,      // floats above all other apps
-        frame: false,           // no title bar or window chrome
-        transparent: true,      // see-through background
+        alwaysOnTop: true,
+        frame: false,
+        transparent: true,
         resizable: false,
-        skipTaskbar: true,      // won't appear in taskbar
+        skipTaskbar: true,
         webPreferences: {
-            nodeIntegration: false,     // keep this off
-            contextIsolation: true,     // keep this on
+            nodeIntegration: false,
+            contextIsolation: true,
             sandbox: true,
             preload: path.join(__dirname, 'preload.js')
         }
     })
 
     bubble.loadFile('bubble.html')
-    // bubble.webContents.openDevTools({ mode: 'detach' })
 }
 
 function createMainWindow() {
@@ -81,18 +80,16 @@ function createMainWindow() {
     mainWindow = new BrowserWindow({
         width: Math.round(limitingDimension * 0.8),
         height: Math.round(limitingDimension * 0.6),
-        // frame: false,
         alwaysOnTop: true,
         autoHideMenuBar: true,
         webPreferences: {
-            nodeIntegration: false,     // keep this off
-            contextIsolation: true,     // keep this on
+            nodeIntegration: false,  
+            contextIsolation: true,    
             sandbox: true,
             preload: path.join(__dirname, 'preload.js')
         }
     })
 
-    mainWindow.loadFile('main.html', { query: { page: 'home' } }) //{query: {page: 'home'}}) default page
-    mainWindow.webContents.openDevTools({ mode: 'detach' })
+    mainWindow.loadFile('main.html', { query: { page: 'home' } })
 
 }

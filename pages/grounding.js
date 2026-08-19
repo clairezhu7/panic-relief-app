@@ -24,11 +24,11 @@ function toggleMusic() {
 }
 
 const STEPS = [
-  { sense: 'see', icon: 'assets/icons/smile-eyes.jpg', instruction: 'Find 5 things you can see', count: 5, description: 'Look around you. Name something you notice.' },
-  { sense: 'touch', icon: '✋', instruction: 'Find 4 things you can touch', count: 4, description: 'Feel the textures around you. What can you reach?' },
-  { sense: 'hear', icon: '👂', instruction: 'Find 3 things you can hear', count: 3, description: 'Listen carefully. What sounds do you notice?' },
-  { sense: 'smell', icon: '👃', instruction: 'Find 2 things you can smell', count: 2, description: 'Take a breath. What scents are present?' },
-  { sense: 'taste', icon: '👅', instruction: 'Find 1 thing you can taste', count: 1, description: 'Notice any taste in your mouth, or take a sip of water.' }
+  { sense: 'see', icon: '👀', instruction: 'Look around.\nWhat is something you see?', count: 5, description: 'see' },
+  { sense: 'touch', icon: '✋', instruction: 'Find something you can touch!', count: 4, description: 'touch' },
+  { sense: 'hear', icon: '👂', instruction: 'Listen carefully. What sounds do you notice?', count: 3, description: 'hear' },
+  { sense: 'smell', icon: '👃', instruction: 'Take a deep breath.\nWhat smells do you detect?', count: 2, description: 'smell' },
+  { sense: 'taste', icon: '👅', instruction: 'What do you taste in your mouth?\n As an alternative, take a sip of water.', count: 1, description: 'taste' }
 ]
 
 let currentStepIndex = 0
@@ -37,12 +37,13 @@ let previousStepIndex = -1
 
 const introScreen = document.getElementById('intro-screen')
 const mainContent = document.getElementById('main-content')
-const buttonRow = document.getElementById('button-row')
+const navButtons = document.getElementById('nav-buttons')
 const icon = document.getElementById('sense-icon')
 const instruction = document.getElementById('instruction')
 const counter = document.getElementById('counter')
 const description = document.getElementById('description')
 const progressFill = document.getElementById('progress-fill')
+const prevBtn = document.getElementById('prev-btn')
 const nextBtn = document.getElementById('next-btn')
 const container = document.getElementById('grounding-container')
 const transcript = document.getElementById('transcript')
@@ -58,14 +59,39 @@ let microphone = null
 let animationId = null
 let hasRecognitionError = false
 
-const VOLUME_THRESHOLD = 30 // Adjust sensitivity (0-255)
+// --- Voice detection tuning ---
+const VOICE_FREQ_MIN = 300   // Hz — lower bound of speech energy band
+const VOICE_FREQ_MAX = 3400  // Hz — upper bound of speech energy band
+const CALIBRATION_MS = 600   // how long to sample ambient noise before starting
+const THRESHOLD_MARGIN = 14  // how far above the noise floor counts as "voice"
+const MIN_THRESHOLD = 16     // never go more sensitive than this
+const MAX_THRESHOLD = 55     // never require louder than this
+
 let volumeHistory = []
+let voiceFreqRange = null    // { lowIndex, highIndex } computed once analyser exists
+let noiseFloor = 12          // running estimate of ambient noise, refined by calibration
+let dynamicThreshold = 30    // replaces the old fixed VOLUME_THRESHOLD
+const FLOOR_WINDOW_MS = 4000 // trailing window used to re-estimate the ambient floor
+let floorWindow = []         // { t, value } samples for the rolling minimum
+
+// --- Auto-advance on detected pause ---
+const MIN_SPEECH_MS = 600        // must speak at least this long before a pause can "count"
+const PAUSE_TO_TRIGGER_MS = 1300 // silence this long looks like end-of-sentence
+const GRACE_PERIOD_MS = 1100     // window to keep talking and cancel the auto-advance
+
+let autoAdvanceEnabled = true
+let speechState = 'idle'         // 'idle' | 'speaking'
+let totalSpeechMs = 0
+let silenceStartTime = null
+let lastFrameTime = null
+let pendingAdvanceTimer = null
+let pendingAdvanceActive = false
 
 
 function startExercise() {
   introScreen.style.display = 'none'
   mainContent.style.display = 'flex'
-  buttonRow.style.display = 'flex'
+  navButtons.style.display = 'flex'
 
   previousStepIndex = -1  // Ensure first display is a full update
   updateDisplay()
@@ -79,20 +105,32 @@ async function startListening() {
       audioContext = new (window.AudioContext || window.webkitAudioContext)()
       analyser = audioContext.createAnalyser()
       analyser.fftSize = 512
-      analyser.smoothingTimeConstant = 0.3
+      analyser.smoothingTimeConstant = 0.25
     }
 
     if (!microphone) {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true, // helps a lot if the app's own music bleeds into the mic via speakers
+          noiseSuppression: true, // reduces steady background noise (fans, hum, etc.)
+          autoGainControl: false  // keep raw levels stable - AGC fighting our own threshold math causes erratic readings
+        },
+        video: false
+      })
       microphone = audioContext.createMediaStreamSource(stream)
       microphone.connect(analyser)
+      computeVoiceFreqRange()
+      transcript.classList.add('active')
+      await calibrateNoiseFloor()
     }
 
     isListening = true
+    resetSpeechState()
     transcriptText.textContent = 'Speak naturally...'
     transcript.classList.add('active')
 
-    detectVoiceActivity()
+    lastFrameTime = null
+    animationId = requestAnimationFrame(detectVoiceActivity)
   } catch (e) {
     console.error('Failed to start voice detection:', e)
     hasRecognitionError = true
@@ -101,9 +139,63 @@ async function startListening() {
   }
 }
 
+// Figure out which FFT bins correspond to typical speech energy (300Hz-3400Hz),
+// so detection isn't diluted by averaging in silent high-frequency bins.
+function computeVoiceFreqRange() {
+  const nyquist = audioContext.sampleRate / 2
+  const binHz = nyquist / analyser.frequencyBinCount
+  const lowIndex = Math.max(1, Math.floor(VOICE_FREQ_MIN / binHz))
+  const highIndex = Math.min(analyser.frequencyBinCount - 1, Math.ceil(VOICE_FREQ_MAX / binHz))
+  voiceFreqRange = { lowIndex, highIndex }
+}
+
+function bandAverage(dataArray) {
+  const { lowIndex, highIndex } = voiceFreqRange
+  let sum = 0
+  let count = 0
+  for (let i = lowIndex; i <= highIndex; i++) {
+    sum += dataArray[i]
+    count++
+  }
+  return count > 0 ? sum / count : 0
+}
+
+function clampThreshold(value) {
+  return Math.min(Math.max(value, MIN_THRESHOLD), MAX_THRESHOLD)
+}
+
+// Briefly sample ambient noise (assumed silence, since this runs right as the
+// mic connects) so the detection threshold adapts to the room/mic instead of
+// relying on one hardcoded guess.
+async function calibrateNoiseFloor() {
+  transcriptText.textContent = 'Getting ready...'
+
+  const samples = []
+  const start = performance.now()
+
+  await new Promise(resolve => {
+    function sample() {
+      const dataArray = new Uint8Array(analyser.frequencyBinCount)
+      analyser.getByteFrequencyData(dataArray)
+      samples.push(bandAverage(dataArray))
+
+      if (performance.now() - start < CALIBRATION_MS) {
+        requestAnimationFrame(sample)
+      } else {
+        resolve()
+      }
+    }
+    requestAnimationFrame(sample)
+  })
+
+  noiseFloor = samples.reduce((a, b) => a + b, 0) / (samples.length || 1)
+  dynamicThreshold = clampThreshold(noiseFloor + THRESHOLD_MARGIN)
+}
+
 function stopListening() {
   isListening = false
   volumeHistory = []
+  resetSpeechState()
 
   if (animationId) {
     cancelAnimationFrame(animationId)
@@ -136,7 +228,7 @@ function drawWaveform(dataArray) {
   }
 }
 
-function detectVoiceActivity() {
+function detectVoiceActivity(timestamp) {
   if (!isListening || !analyser) {
     stopListening()
     return
@@ -144,8 +236,11 @@ function detectVoiceActivity() {
 
   animationId = requestAnimationFrame(detectVoiceActivity)
 
-  const bufferLength = analyser.frequencyBinCount
-  const dataArray = new Uint8Array(bufferLength)
+  if (lastFrameTime === null) lastFrameTime = timestamp
+  const dt = timestamp - lastFrameTime
+  lastFrameTime = timestamp
+
+  const dataArray = new Uint8Array(analyser.frequencyBinCount)
   analyser.getByteFrequencyData(dataArray)
 
   // Draw waveform
@@ -153,30 +248,132 @@ function detectVoiceActivity() {
     drawWaveform(dataArray)
   }
 
-  // Calculate average volume
-  let sum = 0
-  for (let i = 0; i < bufferLength; i++) {
-    sum += dataArray[i]
-  }
-  const averageVolume = sum / bufferLength
+  // Average only over the human-voice frequency band - much less diluted
+  // than averaging across the whole spectrum, so quieter speech registers.
+  const currentBand = bandAverage(dataArray)
 
-  // Track volume over time
-  volumeHistory.push(averageVolume)
-  if (volumeHistory.length > 10) {
+  volumeHistory.push(currentBand)
+  if (volumeHistory.length > 8) {
     volumeHistory.shift()
   }
 
   const recentAverage = volumeHistory.reduce((a, b) => a + b, 0) / volumeHistory.length
 
-  // Update text based on volume (no auto-advance)
-  if (recentAverage > VOLUME_THRESHOLD) {
-    transcriptText.textContent = 'Speaking detected...'
+  // Continuously re-estimate the ambient floor from the quietest point in the
+  // last few seconds. This runs every frame no matter what state we're in -
+  // previously it only ran while "idle," which meant that if noise ever rose
+  // above the threshold, the app would think it was permanently "speaking"
+  // and adaptation would never run again, getting stuck for good.
+  floorWindow.push({ t: timestamp, value: currentBand })
+  while (floorWindow.length && timestamp - floorWindow[0].t > FLOOR_WINDOW_MS) {
+    floorWindow.shift()
+  }
+  const windowMin = floorWindow.reduce((min, s) => Math.min(min, s.value), Infinity)
+  if (Number.isFinite(windowMin)) {
+    noiseFloor = windowMin
+    dynamicThreshold = clampThreshold(noiseFloor + THRESHOLD_MARGIN)
+  }
+
+  const voiceDetected = recentAverage > dynamicThreshold
+
+  if (voiceDetected) {
+    handleVoiceDetected(dt)
   } else {
-    transcriptText.textContent = 'Speak naturally...'
+    handleSilence()
   }
 }
 
-// Old audio visualization functions removed - now using voice activity detection
+function handleVoiceDetected(dt) {
+  if (!pendingAdvanceActive) {
+    transcriptText.textContent = 'Speaking detected...'
+  }
+
+  speechState = 'speaking'
+  totalSpeechMs += dt
+  silenceStartTime = null
+
+  // Talking again during the grace window cancels the pending advance.
+  if (pendingAdvanceActive) {
+    cancelPendingAdvance()
+  }
+}
+
+function handleSilence() {
+  if (pendingAdvanceActive) return // already counting down, leave the UI as-is
+
+  transcriptText.textContent = 'Speak naturally...'
+
+  if (speechState === 'speaking' && totalSpeechMs >= MIN_SPEECH_MS) {
+    if (silenceStartTime === null) {
+      silenceStartTime = performance.now()
+    } else if (performance.now() - silenceStartTime >= PAUSE_TO_TRIGGER_MS) {
+      triggerPendingAdvance()
+    }
+  } else {
+    // Too little speech so far for a pause to mean anything yet.
+    silenceStartTime = null
+  }
+}
+
+// A pause that looks like "end of sentence" doesn't advance immediately -
+// it gives a short, visible grace window so a thinking-pause can be undone
+// just by continuing to talk.
+function triggerPendingAdvance() {
+  if (!autoAdvanceEnabled || pendingAdvanceActive) return
+
+  pendingAdvanceActive = true
+  transcript.classList.add('pending')
+  transcriptText.textContent = 'Got it — moving on...'
+
+  const fill = document.getElementById('advance-progress-fill')
+  if (fill) {
+    fill.style.transition = 'none'
+    fill.style.width = '100%'
+    void fill.offsetWidth // force reflow so the transition below animates
+    fill.style.transition = `width ${GRACE_PERIOD_MS}ms linear`
+    fill.style.width = '0%'
+  }
+
+  pendingAdvanceTimer = setTimeout(() => {
+    pendingAdvanceActive = false
+    transcript.classList.remove('pending')
+    if (!nextBtn.disabled) {
+      nextItem()
+    }
+  }, GRACE_PERIOD_MS)
+}
+
+function cancelPendingAdvance() {
+  pendingAdvanceActive = false
+  if (pendingAdvanceTimer) {
+    clearTimeout(pendingAdvanceTimer)
+    pendingAdvanceTimer = null
+  }
+  transcript.classList.remove('pending')
+  silenceStartTime = null
+}
+
+function resetSpeechState() {
+  speechState = 'idle'
+  totalSpeechMs = 0
+  silenceStartTime = null
+  lastFrameTime = null
+  floorWindow = []
+  cancelPendingAdvance()
+}
+
+function toggleAutoAdvance() {
+  autoAdvanceEnabled = !autoAdvanceEnabled
+  const toggle = document.getElementById('auto-advance-toggle')
+  if (toggle) {
+    toggle.classList.toggle('on', autoAdvanceEnabled)
+    toggle.setAttribute('aria-pressed', String(autoAdvanceEnabled))
+    toggle.textContent = `Auto-advance: ${autoAdvanceEnabled ? 'ON' : 'OFF'}`
+  }
+  if (!autoAdvanceEnabled) {
+    cancelPendingAdvance()
+  }
+}
 
 function updateDisplay() {
   const step = STEPS[currentStepIndex]
@@ -203,6 +400,7 @@ function updateDisplay() {
     }, 300)
 
     updateProgress()
+    updateNavButtons()
     return
   }
 
@@ -251,7 +449,7 @@ function updateDisplay() {
 
     instruction.textContent = step.instruction
     counter.textContent = `${currentItemIndex + 1} / ${step.count}`
-    description.textContent = step.description
+    description.textContent = `Find ${step.count} things you can ${step.description}...`
 
     const finalIcon = document.getElementById('sense-icon')
     finalIcon.style.opacity = '1'
@@ -266,6 +464,12 @@ function updateDisplay() {
   }, 200)
 
   updateProgress()
+  updateNavButtons()
+}
+
+function updateNavButtons() {
+  const atStart = currentStepIndex === 0 && currentItemIndex === 0
+  prevBtn.disabled = atStart
 }
 
 function updateProgress() {
@@ -280,6 +484,24 @@ function updateProgress() {
   const percentage = (totalCompleted / totalItems) * 100
 
   progressFill.style.width = percentage + '%'
+}
+
+function prevItem() {
+  // Already at the very first item - nothing to go back to
+  if (currentStepIndex === 0 && currentItemIndex === 0) return
+
+  hasRecognitionError = false
+  volumeHistory = []
+
+  currentItemIndex--
+
+  // Move to the previous sense if we've walked back past the start of this one
+  if (currentItemIndex < 0) {
+    currentStepIndex--
+    currentItemIndex = STEPS[currentStepIndex].count - 1
+  }
+
+  updateDisplay()
 }
 
 function nextItem() {
@@ -335,6 +557,7 @@ function complete() {
   description.textContent = 'You\'re here. You\'re present. Take a moment to notice how you feel.'
 
   progressFill.style.width = '100%'
+  prevBtn.disabled = true
   nextBtn.disabled = true
 }
 
@@ -349,7 +572,7 @@ function resetGrounding() {
 
   // Return to intro screen
   mainContent.style.display = 'none'
-  buttonRow.style.display = 'none'
+  navButtons.style.display = 'none'
   introScreen.style.display = 'flex'
 
   currentStepIndex = 0
@@ -357,6 +580,7 @@ function resetGrounding() {
   previousStepIndex = -1
 
   progressFill.style.width = '0%'
+  prevBtn.disabled = true
   nextBtn.disabled = false
 }
 

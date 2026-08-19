@@ -37,7 +37,7 @@ setDefaultTechnique()
 
 function setDefaultTechnique() {
   // get from localstorage
-  updateTechnique('478')
+  updateTechnique('box')
 }
 
 

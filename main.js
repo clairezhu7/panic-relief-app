@@ -92,4 +92,5 @@ function createMainWindow() {
 
     mainWindow.loadFile('main.html', { query: { page: 'home' } })
 
+    // mainWindow.webContents.openDevTools({ mode: 'detach' })
 }

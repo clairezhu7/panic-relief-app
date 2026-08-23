@@ -1,21 +1,3 @@
-const DEFAULTS = {
-  defaultPage: 'home',
-  music: true,
-  autostart: false,
-  technique: 'box'
-}
-
-async function loadSettings() {
-  const stored = await window.electronAPI.storageGet('settings')
-  return stored ? JSON.parse(stored) : DEFAULTS
-}
-
-async function saveSetting(key, value) {
-  const current = await loadSettings()
-  current[key] = value
-  window.electronAPI.storageSet('settings', JSON.stringify(current))
-}
-
 // section toggle
 function toggleSection(id) {
   const body = document.getElementById('body-' + id)
@@ -29,6 +11,18 @@ function toggleSetting(key) {
   const el = document.getElementById('toggle-' + key)
   const isOn = el.classList.toggle('on')
   saveSetting(key, isOn)
+}
+
+// number inputs - snaps invalid/out-of-range values to the nearest
+// allowed integer rather than blocking with an error
+function handleNumberSetting(el, key, min, max) {
+  let value = parseFloat(el.value)
+  if (Number.isNaN(value)) value = min
+  value = Math.round(value)
+  value = Math.min(Math.max(value, min), max)
+
+  el.value = value
+  saveSetting(key, value)
 }
 
 // dropdown setup
@@ -66,8 +60,14 @@ function setupDropdown(dropdownId, optionsId, selectedId, storageKey) {
 async function applyStoredSettings() {
   const s = await loadSettings()
 
-  if (s.music) document.getElementById('toggle-music').classList.add('on')
+  // breathing
+  if (s['music-breathing']) document.getElementById('toggle-music-breathing').classList.add('on')
   if (s.autostart) document.getElementById('toggle-autostart').classList.add('on')
+
+  // grounding
+  if (s['music-grounding']) document.getElementById('toggle-music-grounding').classList.add('on')
+  if (s.instructions) document.getElementById('toggle-instructions').classList.add('on')
+  if (s['auto-advance']) document.getElementById('toggle-auto-advance').classList.add('on')
 
   const setDropdown = (optionsId, selectedId, value) => {
     const opt = document.querySelector(`#${optionsId} [data-value="${value}"]`)
@@ -80,6 +80,11 @@ async function applyStoredSettings() {
 
   setDropdown('default-page-options', 'default-page-selected', s.defaultPage)
   setDropdown('technique-options', 'technique-selected', s.technique)
+
+  const numCyclesInput = document.getElementById('input-numCycles')
+  if (numCyclesInput && typeof s.numCycles === 'number') {
+    numCyclesInput.value = s.numCycles
+  }
 }
 
 setupDropdown('default-page-dropdown', 'default-page-options', 'default-page-selected', 'defaultPage')
@@ -88,4 +93,4 @@ setupDropdown('technique-dropdown', 'technique-options', 'technique-selected', '
 applyStoredSettings()
 
 // open breathing section by default
-toggleSection('breathing')
+// toggleSection('breathing')

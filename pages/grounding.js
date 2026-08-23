@@ -1,15 +1,6 @@
-// 5-4-3-2-1 Grounding Technique
-
-// Auto-play background music
 const music = document.getElementById('music')
 const musicToggle = document.getElementById('music-toggle')
-let isMusicPlaying = true
-
-music.play().catch(() => {
-  document.addEventListener('click', () => {
-    music.play()
-  }, { once: true })
-})
+let isMusicPlaying = false
 
 function toggleMusic() {
   if (isMusicPlaying) {
@@ -23,6 +14,24 @@ function toggleMusic() {
   }
 }
 
+function initMusic(shouldPlay) {
+  if (!shouldPlay) {
+    music.pause()
+    isMusicPlaying = false
+    musicToggle.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>'
+    return
+  }
+
+  isMusicPlaying = true
+  musicToggle.innerHTML = '<i class="fa-solid fa-music"></i>'
+
+  music.play().catch(() => {
+    document.addEventListener('click', () => {
+      if (isMusicPlaying) music.play()
+    }, { once: true })
+  })
+}
+
 const STEPS = [
   { sense: 'see', icon: '👀', instruction: 'Look around.\nWhat is something you see?', count: 5, description: 'see' },
   { sense: 'touch', icon: '✋', instruction: 'Find something you can touch!', count: 4, description: 'touch' },
@@ -32,12 +41,14 @@ const STEPS = [
 ]
 
 let currentStepIndex = 0
+let sessionComplete = false 
 let currentItemIndex = 0
 let previousStepIndex = -1
 
 const introScreen = document.getElementById('intro-screen')
 const mainContent = document.getElementById('main-content')
 const navButtons = document.getElementById('nav-buttons')
+const completeScreen = document.getElementById('complete-screen')
 const icon = document.getElementById('sense-icon')
 const instruction = document.getElementById('instruction')
 const counter = document.getElementById('counter')
@@ -51,7 +62,6 @@ const transcriptText = document.getElementById('transcript-text')
 const waveformCanvas = document.getElementById('waveform')
 const waveformCtx = waveformCanvas ? waveformCanvas.getContext('2d') : null
 
-// Voice Activity Detection setup (using volume instead of speech recognition)
 let isListening = false
 let audioContext = null
 let analyser = null
@@ -78,6 +88,9 @@ let floorWindow = []         // { t, value } samples for the rolling minimum
 const MIN_SPEECH_MS = 600        // must speak at least this long before a pause can "count"
 const PAUSE_TO_TRIGGER_MS = 1300 // silence this long looks like end-of-sentence
 const GRACE_PERIOD_MS = 1100     // window to keep talking and cancel the auto-advance
+const CANCEL_DEBOUNCE_MS = 250   // sustained voice needed to cancel a pending advance - filters out
+                                  // brief noise blips (trailing breath, mic bleed) that would otherwise
+                                  // cancel the countdown after a single noisy frame
 
 let autoAdvanceEnabled = true
 let speechState = 'idle'         // 'idle' | 'speaking'
@@ -86,6 +99,7 @@ let silenceStartTime = null
 let lastFrameTime = null
 let pendingAdvanceTimer = null
 let pendingAdvanceActive = false
+let pendingCancelVoiceMs = 0 // tracks sustained voice during the grace window, for debouncing cancels
 
 
 function startExercise() {
@@ -292,14 +306,23 @@ function handleVoiceDetected(dt) {
   totalSpeechMs += dt
   silenceStartTime = null
 
-  // Talking again during the grace window cancels the pending advance.
+  // Talking again during the grace window cancels the pending advance -
+  // but only once it's been sustained for a bit, so a single noisy frame
+  // (trailing breath, mic bleed from background music, etc.) right after
+  // a real pause can't cancel the countdown and restart the whole cycle.
   if (pendingAdvanceActive) {
-    cancelPendingAdvance()
+    pendingCancelVoiceMs += dt
+    if (pendingCancelVoiceMs >= CANCEL_DEBOUNCE_MS) {
+      cancelPendingAdvance()
+    }
   }
 }
 
 function handleSilence() {
-  if (pendingAdvanceActive) return // already counting down, leave the UI as-is
+  if (pendingAdvanceActive) {
+    pendingCancelVoiceMs = 0 // the "voice" blip wasn't sustained - don't let it carry over
+    return // already counting down, leave the UI as-is
+  }
 
   transcriptText.textContent = 'Speak naturally...'
 
@@ -319,9 +342,10 @@ function handleSilence() {
 // it gives a short, visible grace window so a thinking-pause can be undone
 // just by continuing to talk.
 function triggerPendingAdvance() {
-  if (!autoAdvanceEnabled || pendingAdvanceActive) return
+  if (!autoAdvanceEnabled || pendingAdvanceActive || sessionComplete) return
 
   pendingAdvanceActive = true
+  pendingCancelVoiceMs = 0
   transcript.classList.add('pending')
   transcriptText.textContent = 'Got it — moving on...'
 
@@ -345,6 +369,7 @@ function triggerPendingAdvance() {
 
 function cancelPendingAdvance() {
   pendingAdvanceActive = false
+  pendingCancelVoiceMs = 0
   if (pendingAdvanceTimer) {
     clearTimeout(pendingAdvanceTimer)
     pendingAdvanceTimer = null
@@ -487,6 +512,7 @@ function updateProgress() {
 }
 
 function prevItem() {
+  if (sessionComplete) return
   // Already at the very first item - nothing to go back to
   if (currentStepIndex === 0 && currentItemIndex === 0) return
 
@@ -505,6 +531,7 @@ function prevItem() {
 }
 
 function nextItem() {
+  if (sessionComplete) return
   const step = STEPS[currentStepIndex]
 
   // Reset error state when moving to next item
@@ -529,32 +556,14 @@ function nextItem() {
 }
 
 function complete() {
+  sessionComplete = true
   container.classList.add('completed')
 
   stopListening()
-  if (transcript) {
-    transcript.classList.remove('active')
-  }
 
-  const currentIcon = document.getElementById('sense-icon')
-  if (currentIcon) {
-    const iconParent = currentIcon.parentNode
-    if (currentIcon.tagName === 'IMG' && iconParent) {
-      // Convert to div for emoji
-      const emojiDiv = document.createElement('div')
-      emojiDiv.id = 'sense-icon'
-      emojiDiv.className = 'emoji-icon'
-      emojiDiv.textContent = '✨'
-      iconParent.replaceChild(emojiDiv, currentIcon)
-    } else {
-      currentIcon.textContent = '✨'
-      currentIcon.className = 'emoji-icon'
-    }
-  }
-
-  instruction.textContent = 'Well done'
-  counter.textContent = ''
-  description.textContent = 'You\'re here. You\'re present. Take a moment to notice how you feel.'
+  mainContent.style.display = 'none'
+  navButtons.style.display = 'none'
+  completeScreen.style.display = 'flex'
 
   progressFill.style.width = '100%'
   prevBtn.disabled = true
@@ -563,6 +572,7 @@ function complete() {
 
 function resetGrounding() {
   container.classList.remove('completed')
+  sessionComplete = false
 
   stopListening()
 
@@ -571,6 +581,7 @@ function resetGrounding() {
   volumeHistory = []
 
   // Return to intro screen
+  completeScreen.style.display = 'none'
   mainContent.style.display = 'none'
   navButtons.style.display = 'none'
   introScreen.style.display = 'flex'
@@ -584,4 +595,12 @@ function resetGrounding() {
   nextBtn.disabled = false
 }
 
-// Initialize - show intro screen first (already default state in HTML)
+async function applyStoredSettings() {
+  const s = await loadSettings()
+
+  initMusic(s['music-grounding'])
+  if (!s.instructions) startExercise()
+  if (!s['auto-advance']) toggleAutoAdvance()
+}
+
+applyStoredSettings()

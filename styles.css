@@ -1,5 +1,23 @@
+@font-face {
+    font-family: 'Onest';
+    src: url('./assets/fonts/Onest-Regular.ttf') format('truetype');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'Onest';
+    src: url('./assets/fonts/Onest-Medium.ttf') format('truetype');
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'Onest';
+    src: url('./assets/fonts/Onest-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+}
+
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Onest', sans-serif;
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -61,6 +79,6 @@ body {
 }
 
 .navigation-menu button i {
-    font-size: clamp(1.8rem, 7vmin, 3.6rem);
+    font-size: clamp(2.2rem, 6vmin, 3.6rem);
     color: white;
 }

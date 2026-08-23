@@ -1,5 +1,3 @@
-// setTimeout(() => window.electronAPI.navigate('home'), 3500)
-
 runTextAnimation()
 
 function runTextAnimation() {

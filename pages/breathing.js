@@ -33,15 +33,19 @@ var numCycles = 3
 var selectedTechnique
 var phases
 
-setDefaultTechnique()
+const cyclesControl = document.getElementById('cycles-control')
+const cyclesValueEl = document.getElementById('cycles-value')
 
-function setDefaultTechnique() {
-  // get from localstorage
-  updateTechnique('box')
+function updateCyclesDisplay() {
+  cyclesValueEl.textContent = numCycles
 }
 
+function adjustCycles(delta) {
+  if (running) return
+  numCycles = Math.min(Math.max(numCycles + delta, 1), 10)
+  updateCyclesDisplay()
+}
 
-// dropdown
 const techniqueDropdown = document.getElementById('technique-dropdown')
 const dropdownSelected = document.getElementById('dropdown-selected')
 const dropdownLabel = document.getElementById('selected-option')
@@ -119,16 +123,10 @@ document.querySelectorAll('.dropdown-option').forEach(option => {
   option.addEventListener('click', () => {
     if (running) return
 
-    selectedId = option.dataset.id
-    dropdownLabel.textContent = option.textContent
-
-    document.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('active'))
-    option.classList.add('active')
+    selectTechnique(option.dataset.id)
 
     dropdownOptions.classList.remove('open')
     dropdownArrow.classList.remove('open')
-
-    updateTechnique(selectedID)
   })
 })
 
@@ -140,6 +138,19 @@ function updateTechnique(techniqueID) {
     ...PHASE_CONSTANTS.find(c => c.id === phase.id)
   }))
 }
+
+function selectTechnique(techniqueID) {
+  updateTechnique(techniqueID)
+
+  dropdownLabel.textContent = selectedTechnique.name
+  document.querySelectorAll('.dropdown-option').forEach(o => {
+    o.classList.toggle('active', o.dataset.id === techniqueID)
+  })
+}
+
+// Safe starting default so nothing breaks while settings are still loading 
+// (Corrected below with data from storage)
+selectTechnique('box')
 
 const SIZE_SMALL = 25
 const SIZE_LARGE = 45
@@ -434,6 +445,7 @@ function startBreathing() {
   countdown.textContent = secondsLeft + 's'
   cycleLabel.textContent = `Cycle 1 of ${numCycles}`
   techniqueDropdown.classList.add('disabled')
+  cyclesControl.classList.add('disabled')
 
   startParticles()
   ticker = setInterval(tick, 1000)
@@ -453,6 +465,7 @@ function finish() {
   countdown.textContent = ''
   cycleLabel.textContent = ''
   techniqueDropdown.classList.remove('disabled')
+  cyclesControl.classList.remove('disabled')
 }
 
 function resetBreathing() {
@@ -476,6 +489,7 @@ function resetBreathing() {
   countdown.textContent = ''
   cycleLabel.textContent = ''
   techniqueDropdown.classList.remove('disabled')
+  cyclesControl.classList.remove('disabled')
 
   rings.forEach(r => { r.style.opacity = '0' })
 }
@@ -489,13 +503,7 @@ function handleCircleClick() {
 
 const music = document.getElementById('music')
 const musicToggle = document.getElementById('music-toggle')
-let isMusicPlaying = true
-
-music.play().catch(() => {
-  document.addEventListener('click', () => {
-    music.play()
-  }, { once: true })
-})
+let isMusicPlaying = false
 
 function toggleMusic() {
   if (isMusicPlaying) {
@@ -508,3 +516,37 @@ function toggleMusic() {
     isMusicPlaying = true
   }
 }
+
+function initMusic(shouldPlay) {
+  if (!shouldPlay) {
+    music.pause()
+    isMusicPlaying = false
+    musicToggle.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>'
+    return
+  }
+
+  isMusicPlaying = true
+  musicToggle.innerHTML = '<i class="fa-solid fa-music"></i>'
+
+  music.play().catch(() => {
+    document.addEventListener('click', () => {
+      if (isMusicPlaying) music.play()
+    }, { once: true })
+  })
+}
+
+async function applyStoredSettings() {
+  const s = await loadSettings()
+
+  initMusic(s['music-breathing'])
+  if (s.technique) selectTechnique(s.technique)
+
+  if (typeof s.numCycles === 'number' && !Number.isNaN(s.numCycles)) {
+    numCycles = Math.min(Math.max(Math.round(s.numCycles), 1), 10)
+  }
+  updateCyclesDisplay()
+
+  if (s.autostart) startBreathing()
+}
+
+applyStoredSettings()

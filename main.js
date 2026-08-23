@@ -9,6 +9,7 @@ let mainWindow = null
 
 const Store = require('electron-store')
 const storage = new Store()
+const DEFAULTS = require('./settings-defaults.js')
 
 app.whenReady().then(() => {
     // ipcMain.handle('ping', () => 'pong')
@@ -27,8 +28,8 @@ app.whenReady().then(() => {
         }
     })
 
-    const isKeyRegistered = globalShortcut.register('CommandOrControl+Shift+0', () => {
-        console.log('Panic shortcut triggered');
+    const isKeyRegistered = globalShortcut.register('CommandOrControl+Shift+M', () => {
+        // console.log('Panic shortcut triggered');
         createMainWindow()
     })
 
@@ -90,7 +91,14 @@ function createMainWindow() {
         }
     })
 
-    mainWindow.loadFile('main.html', { query: { page: 'home' } })
+    const s = loadSettings()
+
+    mainWindow.loadFile('main.html', { query: { page: s.defaultPage || 'home' } })
 
     // mainWindow.webContents.openDevTools({ mode: 'detach' })
+}
+
+function loadSettings() {
+  const stored = storage.get('settings')
+  return stored ? JSON.parse(stored) : DEFAULTS
 }

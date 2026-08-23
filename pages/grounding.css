@@ -14,6 +14,7 @@
   background-color: #0f0f1a;
   color: white;
   position: relative;
+  font-family: 'Onest', sans-serif;
 }
 
 #music-toggle {
@@ -37,6 +38,7 @@
   font-size: clamp(1rem, 4vmin, 3rem);
   color: white;
   cursor: pointer;
+  font-family: inherit;
 }
 
 #music-toggle:hover {
@@ -66,6 +68,7 @@
 
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 #reset-btn:hover {
@@ -96,6 +99,7 @@
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .auto-advance-btn:hover {
@@ -144,7 +148,8 @@
   margin-bottom: 0;
 }
 
-#start-btn {
+#start-btn,
+#restart-btn {
   width: clamp(10rem, 22vw, 14rem);
   aspect-ratio: 3;
   border: 0.15rem solid #7F77DD;
@@ -153,10 +158,44 @@
   color: white;
   font-size: clamp(1.2rem, 3.3vw, 2rem);
   cursor: pointer;
+  font-family: inherit;
 }
 
-#start-btn:hover {
+#start-btn:hover,
+#restart-btn:hover {
   background: rgba(127, 119, 221, 0.4);
+}
+
+#restart-btn {
+  margin-top: clamp(0.8rem, 4vh, 2.5rem);
+}
+
+/* Completion screen */
+#complete-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.8rem, 3vh, 2rem);
+  text-align: center;
+  margin: 0 1rem;
+}
+
+#complete-icon {
+  font-size: clamp(3rem, 10vmin, 6rem);
+}
+
+#complete-screen h2 {
+  font-size: clamp(2rem, 6vmin, 10rem);
+  font-weight: 400;
+  margin: 0;
+  color: #7F77DD;
+}
+
+#complete-message {
+  font-size: clamp(1rem, 2.8vw, 1.8rem);
+  line-height: 1.7;
+  opacity: 0.85;
+  margin: 0;
 }
 
 /* Progress bar */
@@ -180,12 +219,16 @@
 
 /* Main content */
 #main-content {
+  height: clamp(22rem, 58vh, 42rem);
+  box-sizing: border-box;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(0.8rem, 2vh, 2rem);
+  justify-content: space-evenly;
   text-align: center;
-  justify-content: center;
+
+  gap: clamp(0.3rem, 1vh, 0.75rem);
 }
 
 #sense-icon {
@@ -196,7 +239,6 @@
   animation: fadeIn 0.5s ease;
 }
 
-/* For emoji icons */
 #sense-icon.emoji-icon {
   font-size: clamp(3rem, 7vmin, 4rem);
   width: auto;
@@ -207,6 +249,7 @@
   font-size: clamp(1rem, 4.8vmin, 2rem);
   font-weight: 500;
   margin: 0;
+  white-space: pre-line;
   animation: fadeIn 0.5s ease;
 }
 
@@ -310,6 +353,7 @@
   font-size: clamp(1.1rem, 3.5vmin, 1.6rem);
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 #prev-btn {
@@ -354,7 +398,7 @@
 }
 
 /* Completion message */
-.completed #main-content {
+.completed #complete-screen {
   animation: scaleIn 0.6s ease;
 }
 

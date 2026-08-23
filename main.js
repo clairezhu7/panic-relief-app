@@ -29,7 +29,7 @@ app.whenReady().then(() => {
     })
 
     const isKeyRegistered = globalShortcut.register('CommandOrControl+Shift+M', () => {
-        // console.log('Panic shortcut triggered');
+        console.log('Panic shortcut triggered');
         createMainWindow()
     })
 
@@ -54,6 +54,7 @@ function createBubble() {
         transparent: true,
         resizable: false,
         skipTaskbar: true,
+        icon: path.join(__dirname, 'assets/icons/icon.png'),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -83,6 +84,7 @@ function createMainWindow() {
         height: Math.round(limitingDimension * 0.6),
         alwaysOnTop: true,
         autoHideMenuBar: true,
+        icon: path.join(__dirname, 'assets/icons/icon.png'),
         webPreferences: {
             nodeIntegration: false,  
             contextIsolation: true,    

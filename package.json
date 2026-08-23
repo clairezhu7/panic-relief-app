@@ -1,17 +1,18 @@
 {
-  "name": "panic-relief-app",
+  "name": "mindstep-relax",
+  "productName": "Mindstep Relax",
   "version": "1.0.0",
   "description": "An app that provides immediate relief for device users who experience panic attacks",
-  "homepage": "https://github.com/clairezhu7/panic-relief-app#readme",
+  "homepage": "https://github.com/clairezhu7/mindstep-relax#readme",
   "bugs": {
-    "url": "https://github.com/clairezhu7/panic-relief-app/issues"
+    "url": "https://github.com/clairezhu7/mindstep-relax/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/clairezhu7/panic-relief-app.git"
+    "url": "git+https://github.com/clairezhu7/mindstep-relax.git"
   },
   "license": "MIT",
-  "author": "Claire & Vicky",
+  "author": "Claire Zhu and Vicky Du",
   "type": "commonjs",
   "main": "main.js",
   "directories": {

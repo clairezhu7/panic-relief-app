@@ -5,6 +5,8 @@
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="styles.css">
     <script src="https://kit.fontawesome.com/44fe28e16d.js" crossorigin="anonymous"></script>
+    <script src="./settings-defaults.js"></script>
+    <script src="./settings-storage.js"></script>
     <title>Mindstep Relax</title>
 </head>
 
@@ -12,8 +14,7 @@
     <div id="page"></div>
 
     <script>
-        // get local storage
-
+        
         const params = new URLSearchParams(window.location.search) // get URL
         const page = params.get('page')
 

@@ -1,17 +1,32 @@
+<!-- <head>
+  <link rel="stylesheet" href="grounding.css">
+  <link rel="stylesheet" href="../styles.css">
+  <script src="https://kit.fontawesome.com/44fe28e16d.js" crossorigin="anonymous"></script>
+</head> -->
+
 <div class="navigation-menu">
   <button onclick="window.electronAPI.navigate('home')">
     <i class="fa-solid fa-house"></i>
   </button>
 
-  <!-- <button onclick="window.electronAPI.navigate('settings')">
+  <button onclick="window.electronAPI.navigate('settings')">
     <i class="fa fa-cog" aria-hidden="true"></i>
-  </button> -->
+  </button>
 </div>
 
 <div id="grounding-container">
 
+  <button id="auto-advance-toggle" class="auto-advance-btn on" role="switch" aria-pressed="true"
+    onclick="toggleAutoAdvance()" title="Auto-advance when a pause is detected">
+    Auto-advance: ON
+  </button>
+
   <button id="music-toggle" onclick="toggleMusic()" aria-label="Toggle music">
     <i class="fa-solid fa-music"></i>
+  </button>
+
+  <button id="reset-btn" onclick="resetGrounding()" aria-label="Reset exercise" title="Reset">
+    <i class="fa-solid fa-arrow-rotate-left"></i>
   </button>
 
   <div id="progress-bar">
@@ -21,29 +36,41 @@
   <div id="intro-screen">
     <h1>5-4-3-2-1 Grounding</h1>
     <p id="intro-text">
-      This exercise will guide you through your five senses to help you feel present and calm.
-      <br><br>
-      We'll ask you to observe your surroundings and share what you notice.
-      <br><br>
-      Your voice will be recognized automatically — just speak naturally.
+      <span>This exercise will help you calm down and feel present by letting you focus on your five senses.</span>
+      <span>We'll ask you to observe your surroundings and share what you notice.</span>
+      <span>Your voice will be recognized automatically — just speak naturally.</span>
     </p>
     <button id="start-btn" onclick="startExercise()">Start</button>
   </div>
 
   <div id="main-content" style="display: none;">
-    <img id="sense-icon" src="assets/icons/smile-eyes.jpg" alt="sense icon" />
-    <h2 id="instruction">Find 5 things you can see</h2>
-    <div id="counter">1 / 5</div>
-    <p id="description">Look around you. Name something you notice.</p>
+    <img id="sense-icon" />
+    <h2 id="instruction"></h2>
+    <div id="counter"></div>
+    <p id="description"></p>
     <div id="transcript">
       <canvas id="waveform" width="200" height="40"></canvas>
       <span id="transcript-text">Speak naturally...</span>
+      <div id="advance-progress">
+        <div id="advance-progress-fill"></div>
+      </div>
     </div>
   </div>
 
-  <div id="button-row" style="display: none;">
-    <button id="next-btn" onclick="nextItem()">Next</button>
-    <button onclick="resetGrounding()">Reset</button>
+  <div id="nav-buttons" style="display: none;">
+    <button id="prev-btn" class="nav-btn" onclick="prevItem()" aria-label="Previous" disabled>
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <button id="next-btn" class="nav-btn" onclick="nextItem()" aria-label="Next">
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </div>
+
+  <div id="complete-screen" style="display: none;">
+    <div id="complete-icon" class="emoji-icon">✨</div>
+    <h2>Well done</h2>
+    <p id="complete-message">You are here. You are grounded.<br>You are doing a great job taking care of yourself.</p>
+    <button id="restart-btn" onclick="resetGrounding()">Restart</button>
   </div>
 
   <audio id="music" src="assets/sounds/grounding_music.mp3" loop></audio>

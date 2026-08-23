@@ -9,6 +9,15 @@ let mainWindow = null
 
 const Store = require('electron-store')
 const storage = new Store()
+const DEFAULTS = require('./settings-defaults.js')
+
+// Auto-update via update.electronjs.org. 
+// Reads the repo from package.json's "repository" field automatically, checks GitHub Releases, 
+// and prompts the user to install when a new (non-draft, non-prerelease) release is found.
+// Windows and Mac only - update.electronjs.org doesn't cover Linux, and this
+// module also requires the app to actually be code-signed to take effect (Mac)
+const { updateElectronApp } = require('update-electron-app')
+updateElectronApp()
 
 app.whenReady().then(() => {
     // ipcMain.handle('ping', () => 'pong')
@@ -27,7 +36,7 @@ app.whenReady().then(() => {
         }
     })
 
-    const isKeyRegistered = globalShortcut.register('CommandOrControl+Shift+0', () => {
+    const isKeyRegistered = globalShortcut.register('CommandOrControl+Shift+M', () => {
         console.log('Panic shortcut triggered');
         createMainWindow()
     })
@@ -53,6 +62,7 @@ function createBubble() {
         transparent: true,
         resizable: false,
         skipTaskbar: true,
+        icon: path.join(__dirname, 'assets/icons/icon.png'),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -82,6 +92,7 @@ function createMainWindow() {
         height: Math.round(limitingDimension * 0.6),
         alwaysOnTop: true,
         autoHideMenuBar: true,
+        icon: path.join(__dirname, 'assets/icons/icon.png'),
         webPreferences: {
             nodeIntegration: false,  
             contextIsolation: true,    
@@ -90,6 +101,14 @@ function createMainWindow() {
         }
     })
 
-    mainWindow.loadFile('main.html', { query: { page: 'home' } })
+    const s = loadSettings()
 
+    mainWindow.loadFile('main.html', { query: { page: s.defaultPage || 'home' } })
+
+    // mainWindow.webContents.openDevTools({ mode: 'detach' })
+}
+
+function loadSettings() {
+  const stored = storage.get('settings')
+  return stored ? JSON.parse(stored) : DEFAULTS
 }

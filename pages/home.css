@@ -1,21 +1,3 @@
-@font-face {
-    font-family: 'Onest';
-    src: url('../assets/fonts/Onest-Regular.ttf') format('truetype');
-    font-weight: 400;
-}
-
-@font-face {
-    font-family: 'Onest';
-    src: url('../assets/fonts/Onest-Medium.ttf') format('truetype');
-    font-weight: 500;
-}
-
-@font-face {
-    font-family: 'Onest';
-    src: url('../assets/fonts/Onest-SemiBold.ttf') format('truetype');
-    font-weight: 600;
-}
-
 #home-container {
     width: 100vw;
     height: 100vh;
@@ -28,6 +10,7 @@
 
     background: #0f0f1a;
     overflow: hidden;
+    font-family: 'Onest', sans-serif;
 }
 
 #logo-wrap {
@@ -174,11 +157,12 @@
     color: white;
 
     font-weight: 400;
-    font-size: clamp(1.5rem, 3vw, 8rem);
+    font-size: clamp(1.5rem, 2.5vw, 4.5rem);
     letter-spacing: 0.1em;
 
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: 'Onest', sans-serif;
 }
 
 #feature-buttons button:hover {

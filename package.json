@@ -1,17 +1,18 @@
 {
-  "name": "panic-relief-app",
+  "name": "mindstep-relax",
+  "productName": "Mindstep Relax",
   "version": "1.0.0",
   "description": "An app that provides immediate relief for device users who experience panic attacks",
-  "homepage": "https://github.com/clairezhu7/panic-relief-app#readme",
+  "homepage": "https://github.com/clairezhu7/mindstep-relax#readme",
   "bugs": {
-    "url": "https://github.com/clairezhu7/panic-relief-app/issues"
+    "url": "https://github.com/clairezhu7/mindstep-relax/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/clairezhu7/panic-relief-app.git"
+    "url": "git+https://github.com/clairezhu7/mindstep-relax.git"
   },
   "license": "MIT",
-  "author": "Claire & Vicky",
+  "author": "Claire Zhu and Vicky Du",
   "type": "commonjs",
   "main": "main.js",
   "directories": {
@@ -21,7 +22,8 @@
     "start": "electron-forge start",
     "test": "echo \"Error: no test specified\" && exit 1",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.11.1",
@@ -31,11 +33,13 @@
     "@electron-forge/maker-zip": "^7.11.1",
     "@electron-forge/plugin-auto-unpack-natives": "^7.11.1",
     "@electron-forge/plugin-fuses": "^7.11.1",
+    "@electron-forge/publisher-github": "^7.11.1",
     "@electron/fuses": "^1.8.0",
     "electron": "^41.5.0"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
-    "electron-store": "^8.2.0"
+    "electron-store": "^8.2.0",
+    "update-electron-app": "^3.3.0"
   }
 }

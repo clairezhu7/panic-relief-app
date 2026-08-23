@@ -9,14 +9,21 @@
     <i class="fa-solid fa-house"></i>
   </button>
 
-  <!-- <button id="settings-button" onclick="window.electronAPI.navigate('settings')">
+  <button id="settings-button" onclick="window.electronAPI.navigate('settings')">
     <i class="fa fa-cog" aria-hidden="true"></i>
-  </button> -->
+  </button>
 </div>
 
 <button id="music-toggle" onclick="toggleMusic()" aria-label="Toggle music">
   <i class="fa-solid fa-music"></i>
 </button>
+
+<div id="cycles-control" title="Adjust cycles for this session (change the default in Settings)">
+  <span id="cycles-label">Cycles</span>
+  <button class="cycles-btn" onclick="adjustCycles(-1)" aria-label="Decrease cycles">−</button>
+  <span id="cycles-value">3</span>
+  <button class="cycles-btn" onclick="adjustCycles(1)" aria-label="Increase cycles">+</button>
+</div>
 
 <div id="breathing-container">
 
@@ -58,9 +65,10 @@
 
   <div id="cycle-label"></div>
 
-  <button id="reset-button" onclick="resetBreathing()">Reset</button>
-
-  <audio id="music" src="assets/sounds/breathing_music.mp3" loop autoplay></audio>
+<button id="reset-btn" onclick="resetBreathing()" aria-label="Reset exercise" title="Reset">
+    <i class="fa-solid fa-arrow-rotate-left"></i>
+  </button>
+  <audio id="music" src="assets/sounds/breathing_music.mp3" loop></audio>
 
 </div>
 

@@ -83,22 +83,36 @@
   text-align: center;
 }
 
-#reset-button {
-  width: clamp(8rem, 20vw, 12rem);
-  aspect-ratio: 3;
-  border: 0.15rem solid rgba(255, 255, 255, 0.3);
-  border-radius: 0.5rem;
-  background: transparent;
-  color: white;
-  font-size: clamp(1rem, 2.8vw, 2rem);
+#reset-btn {
+  width: clamp(2rem, 10vmin, 4rem);
+  aspect-ratio: 1;
+  padding: 0;
+
+  position: absolute;
+  bottom: clamp(1rem, 4vmin, 2.5rem);
+  left: clamp(1rem, 3vmin, 2rem);
+
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: clamp(0.85rem, 3.2vmin, 1.5rem);
+  color: rgba(255, 255, 255, 0.65);
+
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-#reset-button:hover {
-  background: rgba(255, 255, 255, 0.08);
+#reset-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
 }
 
-#reset-button:disabled {
+#reset-btn:disabled {
   opacity: 0.4;
   cursor: default;
 }
@@ -197,21 +211,25 @@
 }
 
 #music-toggle {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: clamp(2rem, 10vmin, 4rem);
+  width: clamp(2rem, 10vmin, 4.5rem);
   aspect-ratio: 1;
+  position: absolute;
+  top: clamp(1rem, 4vmin, 2.5rem);
+  right: clamp(1rem, 3vmin, 2rem);
   padding: 0;
-  font-size: clamp(1rem, 4.5vmin, 3rem);
-  background: rgba(127, 119, 221, 0.5);
-  border: 1px solid rgba(127, 119, 221, 0.8);
-  border-radius: 50%;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  background: rgba(127, 119, 221, 0.5);
+  border: 1px solid rgba(127, 119, 221, 0.8);
+  border-radius: 50%;
   transition: all 0.2s ease;
+
+  font-size: clamp(1rem, 4.5vmin, 3rem);
   color: white;
+  cursor: pointer;
 }
 
 #music-toggle:hover {
@@ -221,4 +239,76 @@
 
 #music-toggle i {
   color: white;
+}
+
+#cycles-control {
+  position: absolute;
+  top: clamp(1rem, 4vmin, 2.5rem);
+  left: clamp(1rem, 3vmin, 2rem);
+
+  height: clamp(2rem, 10vmin, 4rem);
+  padding: 0 clamp(0.6rem, 2vmin, 1rem);
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 2vmin, 1rem);
+
+  border-radius: 0.8rem;
+  border: 1px solid rgba(127, 119, 221, 0.4);
+  background: rgba(127, 119, 221, 0.12);
+  color: rgba(255, 255, 255, 0.75);
+
+  font-size: clamp(1rem, 3vmin, 3rem);
+  font-weight: 500;
+  user-select: none;
+  transition: all 0.2s ease;
+}
+
+#cycles-control:hover {
+  border-color: rgba(127, 119, 221, 0.7);
+  background: rgba(127, 119, 221, 0.2);
+}
+
+#cycles-control.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+#cycles-label {
+  white-space: nowrap;
+}
+
+#cycles-value {
+  min-width: 1.3em;
+  text-align: center;
+  color: white;
+  font-variant-numeric: tabular-nums;
+}
+
+.cycles-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: clamp(1.4rem, 6vmin, 2rem);
+  aspect-ratio: 1;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(127, 119, 221, 0.2);
+  color: white;
+  font-size: clamp(0.9rem, 3vmin, 1.3rem);
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cycles-btn:hover {
+  background: rgba(127, 119, 221, 0.4);
+}
+
+.cycles-btn:active {
+  background: rgba(127, 119, 221, 0.55);
 }

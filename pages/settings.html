@@ -1,8 +1,8 @@
-<head>
+<!-- <head>
   <link rel="stylesheet" href="settings.css">
   <link rel="stylesheet" href="../styles.css">
   <script src="https://kit.fontawesome.com/44fe28e16d.js" crossorigin="anonymous"></script>
-</head>
+</head> -->
 
 <div class="navigation-menu">
   <button id="home-button" onclick="window.electronAPI.navigate('home')">
@@ -11,18 +11,22 @@
 </div>
 
 <div id="settings-container">
-  <h1 id="settings-title">Settings</h1>
+
+  <div id="settings-title-wrap">
+    <h1 id="settings-title">Settings</h1>
+  </div>
 
   <div class="settings-section" id="section-general">
     <div class="section-header" onclick="toggleSection('general')">
-      <span>General</span>
+      <i class="fa-solid fa-sliders section-icon"></i>
+      <span class="section-header-label">General</span>
       <i class="fa fa-chevron-down section-arrow" id="arrow-general"></i>
     </div>
     <div class="section-body" id="body-general">
       <div class="setting-row">
         <div class="setting-info">
-          <span class="setting-label">Default page</span>
-          <span class="setting-desc">Page shown when app opens</span>
+          <span class="setting-label">Default Page</span>
+          <span class="setting-desc">The page shown when the app opens</span>
         </div>
         <div class="custom-dropdown" id="default-page-dropdown">
           <div class="dropdown-selected" id="default-page-selected">
@@ -41,7 +45,8 @@
 
   <div class="settings-section" id="section-breathing">
     <div class="section-header" onclick="toggleSection('breathing')">
-      <span>Breathing</span>
+      <i class="fa-solid fa-wind section-icon"></i>
+      <span class="section-header-label">Breathing</span>
       <i class="fa fa-chevron-down section-arrow" id="arrow-breathing"></i>
     </div>
     <div class="section-body" id="body-breathing">
@@ -51,7 +56,7 @@
           <span class="setting-label">Music</span>
           <span class="setting-desc">Play background music by default</span>
         </div>
-        <div class="toggle" id="toggle-music" onclick="toggleSetting('music')">
+        <div class="toggle" id="toggle-music-breathing" onclick="toggleSetting('music-breathing')">
           <div class="toggle-knob"></div>
         </div>
       </div>
@@ -59,7 +64,7 @@
       <div class="setting-row">
         <div class="setting-info">
           <span class="setting-label">Auto-start</span>
-          <span class="setting-desc">Begin breathing exercise immediately on open</span>
+          <span class="setting-desc">Start breathing exercise immediately when opened</span>
         </div>
         <div class="toggle" id="toggle-autostart" onclick="toggleSetting('autostart')">
           <div class="toggle-knob"></div>
@@ -69,7 +74,7 @@
       <div class="setting-row">
         <div class="setting-info">
           <span class="setting-label">Default technique</span>
-          <span class="setting-desc">Breathing pattern loaded by default</span>
+          <span class="setting-desc">The breathing technique used by default</span>
         </div>
         <div class="custom-dropdown" id="technique-dropdown">
           <div class="dropdown-selected" id="technique-selected">
@@ -83,21 +88,67 @@
         </div>
       </div>
 
+      <div class="setting-row">
+        <div class="setting-info">
+          <span class="setting-label">Number of cycles</span>
+          <span class="setting-desc">How many breathing cycles to run per session (1-10)</span>
+        </div>
+        <input
+          type="number"
+          class="setting-number-input"
+          id="input-numCycles"
+          min="1"
+          max="10"
+          step="1"
+          value="3"
+          onchange="handleNumberSetting(this, 'numCycles', 1, 10)"
+        >
+      </div>
+
     </div>
   </div>
 
   <div class="settings-section" id="section-grounding">
     <div class="section-header" onclick="toggleSection('grounding')">
-      <span>Grounding</span>
+      <i class="fa-solid fa-hand section-icon"></i>
+      <span class="section-header-label">Grounding</span>
       <i class="fa fa-chevron-down section-arrow" id="arrow-grounding"></i>
     </div>
     <div class="section-body" id="body-grounding">
+      
       <div class="setting-row">
-        <span class="setting-desc" style="opacity: 0.4;">Grounding settings coming soon.</span>
+        <div class="setting-info">
+          <span class="setting-label">Music</span>
+          <span class="setting-desc">Play background music by default</span>
+        </div>
+        <div class="toggle" id="toggle-music-grounding" onclick="toggleSetting('music-grounding')">
+          <div class="toggle-knob"></div>
+        </div>
       </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <span class="setting-label">Show Instructions</span>
+          <span class="setting-desc">Display instructions for the grounding exercise</span>
+        </div>
+        <div class="toggle" id="toggle-instructions" onclick="toggleSetting('instructions')">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-info">
+          <span class="setting-label">Auto Advance</span>
+          <span class="setting-desc">Automatically move through steps with voice detection</span>
+        </div>
+        <div class="toggle" id="toggle-auto-advance" onclick="toggleSetting('auto-advance')">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
 </div>
 
-<script src="settings.js"></script>
+<!-- <script src="settings.js"></script> -->

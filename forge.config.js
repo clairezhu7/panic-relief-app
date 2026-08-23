@@ -6,7 +6,7 @@ module.exports = {
     asar: true,
     name: 'Mindstep Relax',
     appBundleId: 'com.mindsteprelax.app',
-    // No file extension here - packager appends .ico on Windows and
+    // Packager appends .ico on Windows and
     // .icns on macOS automatically. Linux icons are set per-maker below.
     icon: './assets/icons/icon',
   },
@@ -15,7 +15,7 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        // Icon for the Setup.exe installer
+        // Icon for the Setup.exe installer 
         setupIcon: './assets/icons/icon.ico',
       },
     },
@@ -40,12 +40,28 @@ module.exports = {
       },
     },
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'clairezhu7',
+          name: 'mindstep-relax',
+        },
+        // Creates the GitHub Release as a draft rather than publishing it
+        // live immediately - update.electronjs.org (and update-electron-app)
+        // ignore draft/prerelease releases, so this gives you a chance to
+        // review the built assets before flipping it public.
+        draft: true,
+      },
+    },
+  ],
   plugins: [
     {
       name: '@electron-forge/plugin-auto-unpack-natives',
       config: {},
     },
-    // Fuses: enable / disable Electron functionality
+    // Fuses are used to enable/disable Electron functionality
     // at package time, before code signing the application
     new FusesPlugin({
       version: FuseVersion.V1,

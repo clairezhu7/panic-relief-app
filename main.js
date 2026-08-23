@@ -11,6 +11,14 @@ const Store = require('electron-store')
 const storage = new Store()
 const DEFAULTS = require('./settings-defaults.js')
 
+// Auto-update via update.electronjs.org. 
+// Reads the repo from package.json's "repository" field automatically, checks GitHub Releases, 
+// and prompts the user to install when a new (non-draft, non-prerelease) release is found.
+// Windows and Mac only - update.electronjs.org doesn't cover Linux, and this
+// module also requires the app to actually be code-signed to take effect (Mac)
+const { updateElectronApp } = require('update-electron-app')
+updateElectronApp()
+
 app.whenReady().then(() => {
     // ipcMain.handle('ping', () => 'pong')
     ipcMain.on('open-main-window', () => createMainWindow())

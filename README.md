@@ -11,5 +11,5 @@ A desktop accessibility app that provides immediate support for users experienci
 - Users can set a preferred exercise (Breathing or Grounding) as their default landing page to minimize menu navigations during panic attacks (Settings &#8594; General)
 - Users can customize app defaults, such as music preferences, further reducing unnecessary clicks during emergencies (Settings &#8594; Breathing / Grounding)
 
-**Installation Guide**
+**Installation Guide**<br>
 To install Mindstep Relax, go to the latest release (V1.0.0) and click on the .exe file to download the installer!
